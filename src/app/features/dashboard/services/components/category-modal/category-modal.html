@@ -1,0 +1,68 @@
+<app-generic-modal [isOpen]="isOpen()" [title]="category() ? 'Edit Category' : 'Create Category'" size="sm"
+    (onClose)="handleClose()">
+    <form [formGroup]="form" id="category-form" modal-body (ngSubmit)="onSubmit()" class="space-y-5" novalidate>
+        <app-form-field label="Category Name" fieldId="cat-name" [control]="form.controls.name" type="text"
+            placeholder="e.g. In-Clinic Procedures" [required]="true" errorMessage="Category name is required." />
+
+        <div class="flex flex-col gap-1.5">
+            <label for="cat-icon" class="text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">
+                Category Icon
+            </label>
+            <div class="relative">
+                <span
+                    class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
+                    aria-hidden="true">
+                    {{ form.controls.iconUrl.value || 'category' }}
+                </span>
+                <select id="cat-icon" formControlName="iconUrl"
+                    class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl pl-12 pr-4 py-3 text-body-md text-on-surface focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all outline-none appearance-none cursor-pointer">
+                    <option value="">-- Select an Icon --</option>
+                    @for (icon of materialIcons; track icon.value) {
+                    <option [value]="icon.value">{{ icon.label }}</option>
+                    }
+                </select>
+                <span
+                    class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 pointer-events-none"
+                    aria-hidden="true">
+                    expand_more
+                </span>
+            </div>
+        </div>
+
+        <!-- Simulated Active status toggle -->
+        <div>
+            <div class="flex items-center justify-between gap-4">
+                <span class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+                    Active Category
+                </span>
+                <button type="button" role="switch" [attr.aria-checked]="form.controls.isActive.value"
+                    (click)="form.controls.isActive.setValue(!form.controls.isActive.value)"
+                    class="w-10 h-5 rounded-full relative cursor-pointer shadow-inner transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent-teal/50 shrink-0"
+                    [class]="form.controls.isActive.value ? 'bg-accent-teal' : 'bg-outline-variant'">
+                    <span class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all duration-200"
+                        [class]="form.controls.isActive.value ? 'left-[22px]' : 'left-0.5'" aria-hidden="true"></span>
+                </button>
+            </div>
+            <p class="text-[11px] text-on-surface-variant/70 mt-1.5">
+                If deactivated, all child services will be hidden from patients.
+            </p>
+        </div>
+    </form>
+
+    <div modal-footer class="flex gap-3 justify-end">
+        <button type="button" (click)="handleClose()"
+            class="px-5 py-2 rounded-xl border border-outline-variant font-semibold text-body-md text-on-surface-variant hover:bg-surface-container-low transition-colors focus:outline-none">
+            Cancel
+        </button>
+
+        <button type="submit" form="category-form" [disabled]="isSubmitting()"
+            class="px-6 py-2 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 disabled:opacity-60 transition-all inline-flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/40">
+            @if (isSubmitting()) {
+            <span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+            Saving...
+            } @else {
+            Save Category
+            }
+        </button>
+    </div>
+</app-generic-modal>

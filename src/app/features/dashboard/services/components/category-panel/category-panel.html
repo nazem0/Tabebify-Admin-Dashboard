@@ -1,0 +1,57 @@
+<section class="w-full rounded-tl-2xl flex flex-col bg-surface-container-lowest h-full border-r border-outline-variant/30">
+  <!-- ── Header & Search ──────────────────────────────────── -->
+  <div class="p-6 border-b border-outline-variant/30 bg-surface-container-low/20 shrink-0">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="font-headline-md text-headline-md text-primary ">Categories</h2>
+      <button
+        type="button"
+        (click)="createCategory.emit()"
+        class="text-primary font-bold text-label-sm uppercase tracking-widest flex items-center gap-1 hover:underline focus:outline-none focus:ring-2 focus:ring-primary/20 rounded"
+      >
+        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">add</span>
+        New Category
+      </button>
+    </div>
+
+    <!-- Search input -->
+    <div class="relative">
+      <span
+        class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 pointer-events-none"
+        aria-hidden="true"
+      >search</span>
+      <input
+        type="text"
+        class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl pl-12 pr-4 py-3.5 text-body-md focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all outline-none"
+        placeholder="Search categories..."
+        aria-label="Search categories"
+      />
+    </div>
+  </div>
+
+  <!-- ── Accordion List ───────────────────────────────────── -->
+  <div class="flex-1 overflow-y-auto p-6 space-y-3 custom-scrollbar">
+   <div class="flex flex-1 flex-col overflow-y-auto  space-y-3 custom-scrollbar">
+  @for (cat of categories(); track cat.id) {
+    <app-service-accordion-item
+      [category]="cat"
+      [isExpanded]="expandedCategoryId() === cat.id"
+      [isLoadingServices]="loadingCategoryId() === cat.id"
+      [services]="servicesMap().get(cat.id!) ?? []"
+      [selectedServiceId]="selectedServiceId()"
+      (expand)="categoryExpand.emit($event)"
+      (serviceSelect)="serviceSelect.emit($event)"
+      (editCategory)="editCategory.emit($event)"
+      (deleteCategory)="deleteCategory.emit($event)"
+      (createService)="createService.emit($event)" 
+    />
+  } @empty {
+    <div class="flex flex-col items-center justify-center h-full text-on-surface-variant/50">
+      <span class="material-symbols-outlined text-[48px] opacity-50 mb-3" aria-hidden="true">
+        folder_open
+      </span>
+      <p>No categories found.</p>
+    </div>
+  }
+</div>
+  </div>
+</section>

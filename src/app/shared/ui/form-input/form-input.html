@@ -1,0 +1,53 @@
+<div>
+  <div class="relative">
+    <span
+      class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60 pointer-events-none select-none"
+      aria-hidden="true"
+    >{{ icon() }}</span>
+
+    <input
+      [id]="inputId()"
+      [type]="effectiveType()"
+      [placeholder]="placeholder()"
+      [formControl]="$any(control())"
+      [attr.autocomplete]="autocomplete()"
+      class="w-full pl-12 py-4 bg-surface-container-low border-none rounded-2xl
+             focus:ring-2 focus:ring-primary/20 transition-all outline-none
+             text-sm text-primary placeholder:text-on-surface-variant/50"
+      [class.pr-12]="isPassword()"
+      [class.pr-4]="!isPassword()"
+      [attr.aria-describedby]="control().invalid && control().touched ? inputId() + '-error' : null"
+      [attr.aria-invalid]="control().invalid && control().touched ? 'true' : null"
+    />
+
+    @if (isPassword()) {
+      <button
+        type="button"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60 hover:text-primary transition-colors"
+        [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+        [attr.aria-pressed]="showPassword()"
+        (click)="togglePassword()"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">
+          {{ showPassword() ? 'visibility' : 'visibility_off' }}
+        </span>
+      </button>
+    }
+  </div>
+
+  @if (control().invalid && control().touched) {
+    <p
+      [id]="inputId() + '-error'"
+      class="mt-1.5 text-xs text-error"
+      role="alert"
+    >
+      @if (control().hasError('required')) {
+        {{ placeholder() }} is required.
+      } @else if (control().hasError('minlength')) {
+        Minimum {{ control().getError('minlength').requiredLength }} characters required.
+      } @else if (control().hasError('email')) {
+        Please enter a valid email address.
+      }
+    </p>
+  }
+</div>

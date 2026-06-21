@@ -1,0 +1,35 @@
+<!-- 
+  Right column flex layout.
+  The header and stats bar are pinned to the top (shrink-0),
+  while the table stretches to fill the remaining space.
+-->
+<div class="flex flex-col h-full overflow-y-auto custom-scrollbar">
+
+  <app-service-info-header
+    [serviceId]="service().id!"
+    [serviceName]="service().name!"
+    [serviceDescription]="service().description"
+    [categoryName]="service().categoryName"
+    [isVerified]="service().isVerified"
+    (statusToggle)="statusToggle.emit($event)"
+    (editCoreInfo)="editCoreInfo.emit($event)"
+  />
+
+  <app-service-stats-bar
+    [price]="service().price"
+    [durationMinutes]="service().durationMinutes"
+    [iconUrl]="service().iconUrl!"
+  />
+
+  <div class="px-6 pb-6 flex-1 flex flex-col min-h-0">
+    <app-service-items-table
+      class="h-full flex-1"
+      [items]="items()"
+      [isLoading]="isLoadingItems()"
+      (addItem)="addItem.emit()"
+      (editItem)="editItem.emit($event)"
+      (removeItem)="removeItem.emit($event)"
+    />
+  </div>
+
+</div>

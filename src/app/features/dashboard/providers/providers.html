@@ -1,0 +1,197 @@
+<div class="h-screen flex flex-col justify-between">
+
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg text-primary">Nurse Management</h2>
+      <p class="font-body-lg text-on-surface-variant">Monitor, approve, and organize your clinical nursing staff.</p>
+    </div>
+    <button
+      type="button"
+      class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-sm transition-all active:scale-95 hover:opacity-90"
+      aria-label="Add new nurse"
+      (click)="openCreateModal()"
+    >
+      <span class="material-symbols-outlined text-[20px] pointer-events-none" aria-hidden="true">person_add</span>
+      Add New Nurse
+    </button>
+  </div>
+
+  <!-- Global Error -->
+  @if (error()) {
+    <div role="alert" class="flex items-center gap-2 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
+      <span class="material-symbols-outlined text-[18px] pointer-events-none" aria-hidden="true">error</span>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Bento Grid -->
+  <div class="grid grid-cols-12 gap-gutter grow mt-10">
+
+    <!-- Left Column: Pending + Stats -->
+    <section class="col-span-12 lg:col-span-4 space-y-gutter" aria-label="Pending approvals and stats">
+
+      <!-- Pending Approvals Card -->
+      <div class="bg-white rounded-2xl border border-outline-variant/20 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+            <span class="material-symbols-outlined text-amber-500 text-[22px] pointer-events-none" aria-hidden="true">pending_actions</span>
+            Pending Approvals
+          </h3>
+          @if (pendingCount() > 0) {
+            <span class="bg-error/10 text-error px-3 py-1 rounded-full text-label-sm font-bold">
+              {{ pendingCount() }} New
+            </span>
+          }
+        </div>
+        <app-pending-nurse-list
+          [providers]="pendingProviders()"
+          [isLoading]="isLoadingPending()"
+          [verifyingId]="verifyingId()"
+          (approve)="approve($event)"
+          (reject)="reject($event)"
+          (viewDocuments)="openDocuments($event)"
+        />
+      </div>
+
+      <!-- Total Staff Card -->
+      <div class="bg-primary text-white p-6 rounded-2xl shadow-sm relative overflow-hidden">
+        <div class="relative z-10">
+          <p class="text-[11px] font-bold uppercase tracking-widest opacity-70 mb-2">Total Nursing Staff</p>
+          <p class="text-[44px] font-bold leading-none tabular-nums">{{ totalStaff() }}</p>
+          <p class="text-[13px] opacity-60 mt-1">Healthcare providers</p>
+        </div>
+        <span class="material-symbols-outlined absolute -right-5 -bottom-5 text-[120px] opacity-10 select-none pointer-events-none" aria-hidden="true">medical_services</span>
+      </div>
+
+    </section>
+
+    <!-- Right Column: Active Staff Table -->
+    <section class="col-span-12 lg:col-span-8" aria-label="Active clinical staff">
+
+      <app-generic-table
+    [data]="activeProviders()"
+    [columns]="cols"
+    [totalRecords]="totalCount()"
+    [isLoading]="isLoadingActive()"
+    [pageSize]="pageSize"
+    [activeStates]="nurseActiveStates()"
+    [togglingId]="togglingNurseId()"
+    [(page)]="page"
+    [(search)]="search"
+    exportFileName="users"
+    emptyIcon="group"
+    emptyMessage="No users found"
+    (onLazyLoadEvent)="onPageChange($event)"
+    (onSearch)="onSearch($event)"
+    (onRowClick)="openProfile($event)"
+    (onEdit)="openProfile($event)"
+    (onDelete)="openDeleteNurse($event)"
+    (onToggleBlock)="toggleBlock($event)"
+    (onView)="openProfile($event)"
+  />
+    </section>
+
+  </div>
+
+  <!-- System Alerts -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-gutter" aria-label="System alerts">
+    <div class="bg-white border border-outline-variant/20 p-4 rounded-2xl flex items-center gap-4">
+      <div class="w-11 h-11 rounded-full bg-accent-teal/10 flex items-center justify-center text-accent-teal shrink-0" aria-hidden="true">
+        <span class="material-symbols-outlined text-[20px] pointer-events-none">schedule</span>
+      </div>
+      <div>
+        <h4 class="font-bold text-primary text-body-md">Shift Handover</h4>
+        <p class="text-[12px] text-on-surface-variant mt-0.5">Scheduled in 45 minutes for Wing B.</p>
+      </div>
+    </div>
+    <div class="bg-white border border-outline-variant/20 p-4 rounded-2xl flex items-center gap-4">
+      <div class="w-11 h-11 rounded-full bg-error/10 flex items-center justify-center text-error shrink-0" aria-hidden="true">
+        <span class="material-symbols-outlined text-[20px] pointer-events-none">warning</span>
+      </div>
+      <div>
+        <h4 class="font-bold text-primary text-body-md">Low Staffing Alert</h4>
+        <p class="text-[12px] text-on-surface-variant mt-0.5">Night shift ICU requires 2 more RNs.</p>
+      </div>
+    </div>
+    <div class="bg-white border border-outline-variant/20 p-4 rounded-2xl flex items-center gap-4">
+      <div class="w-11 h-11 rounded-full bg-accent-teal/10 flex items-center justify-center text-accent-teal shrink-0" aria-hidden="true">
+        <span class="material-symbols-outlined text-[20px] pointer-events-none" style="font-variation-settings: 'FILL' 1">verified</span>
+      </div>
+      <div>
+        <h4 class="font-bold text-primary text-body-md">Compliance High</h4>
+        <p class="text-[12px] text-on-surface-variant mt-0.5">98% of staff certifications up to date.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Document Side-Drawer -->
+@if (docProvider()) {
+  <app-document-drawer
+    [isOpen]="docProvider() !== null"
+    [provider]="docProvider()"
+    [documents]="documents()"
+    [isLoading]="isLoadingDocs()"
+    (close)="closeDocuments()"
+  />
+}
+<!-- Create Nurse Modal -->
+<app-modal
+  [isOpen]="showCreateModal()"
+  size="lg"
+  (close)="closeCreateModal()"
+>
+    <div class="flex items-center gap-3" header>
+      <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0" aria-hidden="true">
+        <span class="material-symbols-outlined text-white text-[20px] pointer-events-none">person_add</span>
+      </div>
+      <div header>
+        <h2 class="font-headline-md text-white">Add New Nurse</h2>
+        <p class="text-[12px] text-surface-container-lowest">Create a new nurse account</p>
+      </div>
+    </div>
+  <div class="px-6 py-5 overflow-y-auto" body>
+    <app-nurse-create-form
+      [isOpen]="showCreateModal()"
+      (nurseCreated)="onNurseCreated()"
+      (closed)="closeCreateModal()"
+    />
+  </div>
+</app-modal>
+
+<!-- Nurse Profile Modal -->
+<app-nurse-profile-modal
+  [provider]="profileProvider()"
+  (close)="closeProfile()"
+  (viewDocuments)="openDocuments($event)"
+/>
+
+<!-- Delete Nurse Confirmation -->
+<app-confirmation-modal
+  [isOpen]="deleteNurseTarget() !== null"
+  title="Delete Nurse"
+  [message]="'Permanently delete ' + (deleteNurseTarget()?.fullName ?? 'this nurse') + '? This action cannot be undone.'"
+  confirmLabel="Delete"
+  confirmingLabel="Deleting…"
+  variant="danger"
+  icon="delete_forever"
+  [isConfirming]="isDeletingNurse()"
+  (confirm)="confirmDeleteNurse()"
+  (cancel)="cancelDeleteNurse()"
+/>
+
+<!-- Request Documents Confirmation -->
+<app-confirmation-modal
+  [isOpen]="requestDocsTarget() !== null"
+  title="Request Documents"
+  [message]="'Send a document request to ' + (requestDocsTarget()?.fullName ?? 'this nurse') + '? They will be notified to upload missing credentials.'"
+  confirmLabel="Send Request"
+  confirmingLabel="Sending…"
+  variant="warning"
+  icon="request_page"
+  [isConfirming]="isRequestingDocs()"
+  (confirm)="confirmRequestDocs()"
+  (cancel)="cancelRequestDocs()"
+/>

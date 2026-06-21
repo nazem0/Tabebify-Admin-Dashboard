@@ -1,0 +1,132 @@
+<!-- Backdrop -->
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+    (click)="close.emit()"
+    aria-hidden="true"
+  ></div>
+}
+
+<!-- Side Drawer -->
+<aside
+  class="fixed top-0 right-0 z-50 h-screen w-full max-w-lg bg-white shadow-2xl flex flex-col transition-transform duration-300 ease-in-out"
+  [class]="isOpen() ? 'translate-x-0' : 'translate-x-full'"
+  role="complementary"
+  [attr.aria-label]="'Documents for ' + (provider()?.fullName ?? 'nurse')"
+  [attr.aria-hidden]="!isOpen()"
+>
+
+  <!-- Drawer Header -->
+  <div class="flex items-center justify-between px-6 py-5 border-b border-outline-variant/20 shrink-0 bg-white">
+    <div class="flex items-center gap-3 min-w-0">
+      @if (provider()) {
+        <div
+          class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary shrink-0"
+          aria-hidden="true"
+        >{{ provider()!.fullName | initials }}</div>
+        <div class="min-w-0">
+          <h2 class="font-headline-md text-primary truncate">{{ provider()!.fullName ?? '—' }}</h2>
+          <p class="text-[12px] text-on-surface-variant">Submitted documents</p>
+        </div>
+      }
+    </div>
+    <button
+      type="button"
+      class="w-10 h-10 inline-flex items-center justify-center rounded-xl hover:bg-surface-container-low transition-colors text-on-surface-variant shrink-0"
+      (click)="close.emit()"
+      aria-label="Close document drawer"
+    >
+      <span class="material-symbols-outlined text-[20px] pointer-events-none" aria-hidden="true">close</span>
+    </button>
+  </div>
+
+  <!-- Drawer Body -->
+  <div class="flex-1 overflow-y-auto px-6 py-5">
+
+    @if (isLoading()) {
+      <div class="space-y-4" aria-busy="true" aria-label="Loading documents">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="animate-pulse rounded-2xl bg-surface-container-low h-28"></div>
+        }
+      </div>
+    } @else if (documents().length === 0) {
+      <div class="flex flex-col items-center justify-center py-16 text-on-surface-variant">
+        <div class="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center mb-4" aria-hidden="true">
+          <span class="material-symbols-outlined text-[32px] text-primary/30">folder_open</span>
+        </div>
+        <p class="font-semibold text-primary">No documents submitted</p>
+        <p class="text-sm mt-1 text-on-surface-variant text-center">
+          This provider has not uploaded any documents yet.
+        </p>
+      </div>
+    } @else {
+      <div class="space-y-4" role="list" aria-label="Provider documents">
+        @for (doc of documents(); track doc.id) {
+          <div
+            class="rounded-2xl border border-outline-variant/20 bg-surface-container-lowest overflow-hidden"
+            role="listitem"
+          >
+            <!-- Doc header row -->
+            <div class="flex items-center justify-between px-5 py-4 bg-surface-container-low/50">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="material-symbols-outlined text-primary text-[22px] shrink-0" aria-hidden="true">description</span>
+                <div class="min-w-0">
+                  <p class="font-semibold text-primary truncate">{{ doc.documentType ?? 'Document' }}</p>
+                  <p class="text-[11px] text-on-surface-variant mt-0.5">Uploaded {{ doc.createdAt | appDate }}</p>
+                </div>
+              </div>
+              <app-status-badge
+                [status]="doc.status ?? 'pending'"
+                scheme="document"
+              />
+            </div>
+
+            <!-- File preview / link -->
+            @if (doc.fileUrl) {
+              <div class="px-5 py-4">
+                @if (isImageUrl(doc.fileUrl)) {
+                  <img
+                    [src]="doc.fileUrl"
+                    [alt]="doc.documentType ?? 'Document'"
+                    class="w-full max-h-52 object-contain rounded-xl border border-outline-variant/20 bg-surface-container-low"
+                  />
+                } @else {
+                  <a
+                    [href]="doc.fileUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary/5 text-primary font-semibold text-body-md hover:bg-primary/10 transition-colors"
+                    [attr.aria-label]="'Open ' + doc.documentType"
+                  >
+                    <span class="material-symbols-outlined text-[18px] pointer-events-none" aria-hidden="true">open_in_new</span>
+                    Open Document
+                  </a>
+                }
+              </div>
+            }
+
+            <!-- Rejection reason -->
+            @if (doc.rejectionReason) {
+              <div class="mx-5 mb-4 flex items-start gap-2 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
+                <span class="material-symbols-outlined text-[16px] mt-0.5 shrink-0 pointer-events-none" aria-hidden="true">info</span>
+                <span>{{ doc.rejectionReason }}</span>
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+
+  <!-- Drawer Footer -->
+  <div class="shrink-0 px-6 py-4 border-t border-outline-variant/20 bg-white">
+    <button
+      type="button"
+      class="w-full py-2.5 rounded-xl border border-outline-variant font-semibold text-body-md text-on-surface-variant hover:bg-surface-container-low transition-colors"
+      (click)="close.emit()"
+    >Close</button>
+  </div>
+
+</aside>

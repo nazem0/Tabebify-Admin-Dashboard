@@ -1,0 +1,249 @@
+<div class="p-gutter space-y-gutter max-w-[1440px]">
+
+  <!-- Page Header -->
+  <div>
+    <h2 class="font-headline-lg text-headline-lg text-primary tracking-tight">Support Management</h2>
+    <p class="font-body-md text-on-surface-variant">Monitor and respond to user support conversations.</p>
+  </div>
+
+  <!-- Error Banner -->
+  @if (error()) {
+    <div role="alert" class="flex items-center gap-2 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
+      <span class="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- ── Stat Cards ── -->
+  @if (isLoading()) {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="animate-pulse rounded-2xl bg-surface-container-low h-28"></div>
+      }
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+
+      <div class="bg-primary rounded-2xl p-6 flex items-center gap-4 relative overflow-hidden shadow-sm">
+        <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+          <span class="material-symbols-outlined text-white text-[22px]">support_agent</span>
+        </div>
+        <div>
+          <p class="text-3xl font-bold text-white tabular-nums">{{ supportChats().length }}</p>
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-white/70 mt-0.5">Total Tickets</p>
+        </div>
+        <span class="material-symbols-outlined absolute -right-3 -bottom-3 text-[80px] opacity-10 select-none pointer-events-none text-white" aria-hidden="true">support_agent</span>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+          <span class="material-symbols-outlined text-error text-[22px]">mark_unread_chat_alt</span>
+        </div>
+        <div>
+          <p class="text-3xl font-bold text-primary tabular-nums">{{ totalUnread() }}</p>
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant/60 mt-0.5">Unread Messages</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-accent-teal/10 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+          <span class="material-symbols-outlined text-accent-teal text-[22px]">chat_bubble</span>
+        </div>
+        <div>
+          <p class="text-3xl font-bold text-primary tabular-nums">{{ activeCount() }}</p>
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant/60 mt-0.5">Awaiting Reply</p>
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- ── Two-Pane Chat Layout ── -->
+  <div class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-gutter">
+
+    <!-- ── Chat List Pane ── -->
+    <section class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden flex flex-col" aria-label="Support conversations list">
+
+      <!-- Search -->
+      <div class="px-4 py-4 border-b border-outline-variant/20">
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" aria-hidden="true">search</span>
+          <input
+            type="search"
+            class="w-full pl-9 pr-4 py-2 bg-surface-container-low border-none rounded-lg text-body-md focus:ring-2 focus:ring-accent-teal/40 outline-none"
+            placeholder="Search conversations..."
+            [value]="search()"
+            (input)="onSearch($any($event.target).value)"
+            aria-label="Search support conversations"
+          />
+        </div>
+      </div>
+
+      <!-- List -->
+      <div class="flex-1 overflow-y-auto divide-y divide-outline-variant/20" role="list">
+
+        @if (isLoading()) {
+          <div class="p-4 space-y-4" aria-busy="true" aria-label="Loading conversations">
+            @for (i of [1, 2, 3, 4, 5]; track i) {
+              <div class="animate-pulse flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full bg-surface-container-low flex-shrink-0"></div>
+                <div class="flex-1 space-y-2 pt-1">
+                  <div class="h-3.5 bg-surface-container-low rounded w-1/2"></div>
+                  <div class="h-3 bg-surface-container-low rounded w-3/4"></div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else if (supportChats().length === 0) {
+          <div class="flex flex-col items-center justify-center py-16 text-on-surface-variant px-4 text-center">
+            <span class="material-symbols-outlined text-[48px] opacity-30" aria-hidden="true">inbox</span>
+            <p class="text-sm mt-3 font-semibold text-primary">No support tickets</p>
+            <p class="text-xs mt-1">
+              @if (search()) {
+                No results for "{{ search() }}".
+                <button class="text-accent-teal underline" (click)="onSearch('')">Clear</button>
+              } @else {
+                All clear — no open support conversations.
+              }
+            </p>
+          </div>
+        } @else {
+          @for (chat of supportChats(); track chat.id) {
+            <button
+              role="listitem"
+              class="w-full text-left px-4 py-4 flex items-start gap-3 transition-colors hover:bg-surface-container-low/50 focus:outline-none focus:bg-surface-container-low/50"
+              [class]="selectedChatId() === chat.id ? 'bg-primary/5 border-l-2 border-primary' : ''"
+              (click)="selectChat(chat)"
+              [attr.aria-label]="'Open conversation with ' + chat.otherUserName"
+              [attr.aria-pressed]="selectedChatId() === chat.id"
+            >
+              <div
+                class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                [class]="(chat.unreadCount ?? 0) > 0 ? 'bg-primary text-white' : 'bg-surface-container-low text-primary'"
+                aria-hidden="true"
+              >{{ chat.otherUserName | initials }}</div>
+
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                  <p class="font-semibold text-primary text-body-md truncate">{{ chat.otherUserName ?? 'Unknown User' }}</p>
+                  <span class="text-[11px] text-on-surface-variant flex-shrink-0">{{ chat.lastMessageAt | relativeDate }}</span>
+                </div>
+                <p class="text-[12px] text-on-surface-variant truncate mt-0.5">
+                  {{ chat.lastMessage || 'No messages yet' }}
+                </p>
+              </div>
+
+              @if ((chat.unreadCount ?? 0) > 0) {
+                <span
+                  class="flex-shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center"
+                  [attr.aria-label]="chat.unreadCount + ' unread messages'"
+                >{{ chat.unreadCount }}</span>
+              }
+
+            </button>
+          }
+        }
+
+      </div>
+    </section>
+
+    <!-- ── Chat Detail Pane ── -->
+    <section class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden flex flex-col" aria-label="Conversation messages">
+
+      @if (!selectedChatId()) {
+        <div class="flex-1 flex flex-col items-center justify-center py-20 text-on-surface-variant px-6 text-center">
+          <div class="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center mb-4" aria-hidden="true">
+            <span class="material-symbols-outlined text-[40px] text-primary/30">forum</span>
+          </div>
+          <p class="font-semibold text-primary">Select a conversation</p>
+          <p class="text-sm mt-1">Choose a ticket from the list to view messages and respond.</p>
+        </div>
+
+      } @else {
+
+        <!-- Chat Header -->
+        <div class="px-6 py-4 border-b border-outline-variant/20 flex items-center gap-4">
+          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary flex-shrink-0" aria-hidden="true">
+            {{ selectedChat()?.otherUserName | initials }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-primary text-body-md">{{ selectedChat()?.otherUserName ?? 'Unknown User' }}</p>
+            <p class="text-[12px] text-on-surface-variant">
+              Support conversation · {{ selectedChat()?.lastMessageAt | relativeDate }}
+            </p>
+          </div>
+          @if ((selectedChat()?.unreadCount ?? 0) > 0) {
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-error/10 text-error">
+              {{ selectedChat()?.unreadCount }} unread
+            </span>
+          }
+        </div>
+
+        <!-- Messages -->
+        <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-0" aria-live="polite" aria-label="Messages">
+
+          @if (isLoadingMessages()) {
+            <div class="space-y-4" aria-busy="true" aria-label="Loading messages">
+              @for (i of [1, 2, 3]; track i) {
+                <div class="animate-pulse flex gap-3" [class]="i % 2 === 0 ? 'flex-row-reverse' : ''">
+                  <div class="w-8 h-8 rounded-full bg-surface-container-low flex-shrink-0"></div>
+                  <div class="h-10 bg-surface-container-low rounded-2xl" [style.width.%]="40 + (i * 10)"></div>
+                </div>
+              }
+            </div>
+          } @else if (messages().length === 0) {
+            <div class="flex flex-col items-center justify-center py-12 text-on-surface-variant">
+              <span class="material-symbols-outlined text-[40px] opacity-30" aria-hidden="true">chat_bubble_outline</span>
+              <p class="text-sm mt-3">No messages in this conversation yet.</p>
+            </div>
+          } @else {
+            @for (msg of messages(); track msg.id) {
+              <div
+                class="flex gap-3 items-end"
+                [class]="msg.senderId !== selectedChat()?.otherUserId ? 'flex-row-reverse' : ''"
+              >
+                <div
+                  class="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold"
+                  [class]="msg.senderId !== selectedChat()?.otherUserId
+                    ? 'bg-primary text-white'
+                    : 'bg-surface-container-low text-primary'"
+                  aria-hidden="true"
+                >
+                  {{ msg.senderId !== selectedChat()?.otherUserId ? 'A' : (selectedChat()?.otherUserName | initials) }}
+                </div>
+
+                <div
+                  class="max-w-[70%] px-4 py-2.5 rounded-2xl text-body-md leading-relaxed"
+                  [class]="msg.senderId !== selectedChat()?.otherUserId
+                    ? 'bg-primary text-white rounded-br-sm'
+                    : 'bg-surface-container-low text-primary rounded-bl-sm'"
+                >
+                  <p>{{ msg.content }}</p>
+                  <p
+                    class="text-[10px] mt-1"
+                    [class]="msg.senderId !== selectedChat()?.otherUserId ? 'text-white/60' : 'text-on-surface-variant'"
+                  >{{ msg.createdAt | date:'shortTime' }}</p>
+                </div>
+              </div>
+            }
+          }
+
+        </div>
+
+        <!-- Reply Note -->
+        <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low/30">
+          <div class="flex items-center gap-3 p-3 rounded-xl border border-outline-variant/30 bg-white">
+            <span class="material-symbols-outlined text-[18px] text-on-surface-variant" aria-hidden="true">info</span>
+            <p class="text-[12px] text-on-surface-variant flex-1">
+              Reply functionality requires a messaging API endpoint. View-only mode is active.
+            </p>
+          </div>
+        </div>
+
+      }
+
+    </section>
+
+  </div>
+
+</div>

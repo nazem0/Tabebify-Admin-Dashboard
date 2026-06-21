@@ -1,0 +1,154 @@
+    <app-generic-modal
+      [isOpen]="isOpen()"
+      [title]="editItemTarget() ? 'Edit Service Item' : 'Add Service Item'"
+      size="sm"
+      (onClose)="handleClose()"
+    >
+      <form
+        [formGroup]="addItemForm"
+        id="add-item-form"
+        modal-body
+        (ngSubmit)="onSubmit()"
+        class="space-y-5"
+        novalidate
+        aria-label="Add or Edit service item form"
+      >
+        <!-- Mode Toggle (Only show when adding, not editing) -->
+        @if (!editItemTarget()) {
+          <div class="flex items-center gap-2 mb-4">
+            <button
+              type="button"
+              (click)="isCreatingNew.set(false)"
+              class="flex-1 py-2 text-label-sm font-bold uppercase tracking-wider rounded-lg transition-colors border"
+              [class]="!isCreatingNew() ? 'bg-primary text-white border-primary' : 'bg-surface-container-low text-on-surface-variant border-outline-variant/50'"
+            >
+              Select Existing
+            </button>
+            <button
+              type="button"
+              (click)="isCreatingNew.set(true)"
+              class="flex-1 py-2 text-label-sm font-bold uppercase tracking-wider rounded-lg transition-colors border"
+              [class]="isCreatingNew() ? 'bg-primary text-white border-primary' : 'bg-surface-container-low text-on-surface-variant border-outline-variant/50'"
+            >
+              Create New
+            </button>
+          </div>
+        }
+
+        @if (!isCreatingNew() && !editItemTarget()) {
+          <!-- Existing Item Mode -->
+          <div class="flex flex-col gap-1.5">
+            <label for="add-item-id" class="text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">
+              Select Procedure / Item <span class="text-error">*</span>
+            </label>
+            <select
+              id="add-item-id"
+              formControlName="itemId"
+              class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl px-4 py-3 text-body-md text-on-surface focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all outline-none"
+              [class.border-error]="addItemForm.controls.itemId.invalid && addItemForm.controls.itemId.touched"
+            >
+              <option value="" disabled selected>-- Choose an item --</option>
+              @for (item of itemToResponseLookup(); track item.id) {
+                <option [value]="item.id">{{ item.name }}</option>
+              }
+            </select>
+            @if (addItemForm.controls.itemId.invalid && addItemForm.controls.itemId.touched) {
+              <span class="text-label-sm text-error">Please select an item.</span>
+            }
+          </div>
+
+          <app-form-field
+            label="Quantity"
+            fieldId="add-item-quantity"
+            [control]="addItemForm.controls.quantity"
+            type="number"
+            placeholder="1"
+            [required]="true"
+            errorMessage="A valid quantity of 1 or more is required."
+          />
+        } @else {
+          <!-- Create New or Edit Mode -->
+          
+          <app-form-field
+            label="Item Name"
+            fieldId="add-new-item-name"
+            [control]="addItemForm.controls.name"
+            type="text"
+            placeholder="e.g. Saline Drip"
+            [required]="true"
+            errorMessage="Item name is required and max 128 characters."
+          />
+
+          <app-form-field
+            label="Default Price ($)"
+            fieldId="add-new-item-price"
+            [control]="addItemForm.controls.defaultPrice"
+            type="number"
+            placeholder="0.00"
+            [required]="true"
+            errorMessage="A valid price > 0 is required."
+          />
+          
+          <app-form-field
+            label="Quantity in this Service"
+            fieldId="add-new-item-qty"
+            [control]="addItemForm.controls.quantity"
+            type="number"
+            placeholder="1"
+            [required]="true"
+            errorMessage="Quantity must be at least 1."
+          />
+
+          <!-- Active status toggle (Global item state) -->
+          <div>
+            <div class="flex items-center justify-between gap-4">
+              <span class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+                Active Global Item
+              </span>
+              <button
+                type="button"
+                role="switch"
+                [attr.aria-checked]="addItemForm.controls.isActive.value"
+                (click)="addItemForm.controls.isActive.setValue(!addItemForm.controls.isActive.value)"
+                class="w-10 h-5 rounded-full relative cursor-pointer shadow-inner transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent-teal/50 shrink-0"
+                [class]="addItemForm.controls.isActive.value ? 'bg-accent-teal' : 'bg-outline-variant'"
+              >
+                <span
+                  class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all duration-200"
+                  [class]="addItemForm.controls.isActive.value ? 'left-[22px]' : 'left-0.5'"
+                  aria-hidden="true"
+                ></span>
+              </button>
+            </div>
+          </div>
+        }
+      </form>
+
+      <div modal-footer class="flex gap-3 justify-end">
+        <button
+          type="button"
+          (click)="handleClose()"
+          class="px-5 py-2 rounded-xl border border-outline-variant font-semibold text-body-md text-on-surface-variant hover:bg-surface-container-low transition-colors"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          form="add-item-form"
+          [disabled]="isSubmittingItem()"
+          class="px-6 py-2 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 disabled:opacity-60 transition-all inline-flex items-center gap-2"
+          (click)="onSubmit()"
+        >
+          @if (isSubmittingItem()) {
+            <svg class="animate-spin h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Saving…
+          } @else {
+            {{ editItemTarget() ? 'Save Changes' : (isCreatingNew() ? 'Create & Add' : 'Add Item') }}
+          }
+        </button>
+      </div>
+    </app-generic-modal>

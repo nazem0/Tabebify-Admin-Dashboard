@@ -1,0 +1,267 @@
+<div class="p-gutter space-y-gutter max-w-360">
+
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg text-primary">Booking Management</h2>
+      <p class="font-body-lg text-on-surface-variant">Monitor and coordinate clinical home visits and appointments.</p>
+    </div>
+    <div class="flex items-center gap-2 text-label-sm text-on-surface-variant">
+      <span class="w-3 h-3 rounded border-2 border-dashed border-accent-teal inline-block" aria-hidden="true"></span>
+      Dashed border = nurse not yet assigned
+    </div>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <div role="alert" class="flex items-center gap-2 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
+      <span class="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Filter Bar -->
+  <div class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <!-- Search -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="booking-search">Search</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" aria-hidden="true">search</span>
+          <input
+            id="booking-search"
+            type="search"
+            class="w-full pl-9 pr-4 py-2.5 bg-surface-container-low border-none rounded-xl text-body-md focus:ring-2 focus:ring-accent-teal/40 outline-none"
+            placeholder="Patient, nurse or visit #..."
+            [value]="search()"
+            (input)="onSearch($any($event.target).value)"
+            aria-label="Search bookings"
+          />
+        </div>
+      </div>
+
+      <!-- Date Range -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="date-range-filter">Date Range</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" aria-hidden="true">calendar_today</span>
+          <select
+            id="date-range-filter"
+            class="w-full pl-9 pr-8 py-2.5 bg-surface-container-low border-none rounded-xl text-body-md focus:ring-2 focus:ring-accent-teal/40 outline-none appearance-none cursor-pointer"
+            (change)="onDateRangeChange($any($event.target).value)"
+          >
+            @for (opt of dateRangeOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+          <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none" aria-hidden="true">expand_more</span>
+        </div>
+      </div>
+
+      <!-- Nurse Assigned -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="assigned-filter">Nurse Assigned</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" aria-hidden="true">person_search</span>
+          <select
+            id="assigned-filter"
+            class="w-full pl-9 pr-8 py-2.5 bg-surface-container-low border-none rounded-xl text-body-md focus:ring-2 focus:ring-accent-teal/40 outline-none appearance-none cursor-pointer"
+            (change)="onAssignedChange($any($event.target).value)"
+          >
+            @for (opt of assignedOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+          <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none" aria-hidden="true">expand_more</span>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="status-filter">Status</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" aria-hidden="true">pending_actions</span>
+          <select
+            id="status-filter"
+            class="w-full pl-9 pr-8 py-2.5 bg-surface-container-low border-none rounded-xl text-body-md focus:ring-2 focus:ring-accent-teal/40 outline-none appearance-none cursor-pointer"
+            (change)="onStatusChange($any($event.target).value)"
+          >
+            @for (opt of statusOptions; track opt.value) {
+              <option [value]="opt.value ?? 'null'">{{ opt.label }}</option>
+            }
+          </select>
+          <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none" aria-hidden="true">expand_more</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bookings List -->
+  @if (isLoading()) {
+    <div class="space-y-4" aria-busy="true" aria-label="Loading bookings">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="animate-pulse bg-white rounded-2xl border border-outline-variant/20 p-6 h-36"></div>
+      }
+    </div>
+
+  } @else if (filteredBookings().length === 0) {
+    <div class="bg-white rounded-2xl border border-outline-variant/20 flex flex-col items-center justify-center py-20 text-on-surface-variant">
+      <span class="material-symbols-outlined text-[52px] opacity-20" aria-hidden="true">calendar_month</span>
+      <p class="text-sm font-medium mt-3">No bookings found</p>
+      @if (search() || statusFilter() !== null) {
+        <button
+          class="mt-3 text-sm text-accent-teal font-semibold underline underline-offset-2"
+          (click)="onSearch(''); onStatusChange('null')"
+        >Clear filters</button>
+      }
+    </div>
+
+  } @else {
+    <div class="flex flex-col gap-4" role="list" aria-label="Booking list">
+      @for (booking of filteredBookings(); track booking.id) {
+        <article
+          class="bg-white rounded-2xl overflow-hidden transition-shadow hover:shadow-md"
+          [class]="isUnassigned(booking)
+            ? 'border-2 border-dashed border-accent-teal'
+            : 'border border-outline-variant/20'"
+          role="listitem"
+          [attr.aria-label]="'Booking ' + (booking.visitNumber ?? booking.id)"
+        >
+          <div class="p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+
+            <!-- Visit ID -->
+            <div class="lg:col-span-3 flex items-center gap-3">
+              <div
+                class="w-11 h-11 rounded-full bg-primary/8 flex items-center justify-center font-bold text-primary text-sm shrink-0"
+                aria-hidden="true"
+              >{{ booking.assignedProviderName | initials }}</div>
+              <div class="min-w-0">
+                <p class="font-bold text-primary text-[15px] truncate">{{ booking.assignedProviderName ?? '—' }}</p>
+                <p class="text-[11px] text-on-surface-variant font-mono">{{ booking.visitNumber ?? booking.id?.slice(0, 8)?.toUpperCase() }}</p>
+              </div>
+            </div>
+
+            <!-- Service -->
+            <div class="lg:col-span-2">
+              <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-0.5">Service</p>
+              <p class="font-semibold text-primary text-body-md">{{ booking.serviceName ?? '—' }}</p>
+            </div>
+
+            <!-- Date -->
+            <div class="lg:col-span-2">
+              <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-0.5">Date</p>
+              <p class="font-semibold text-primary text-body-md">{{ booking.createdAt | appDate }}</p>
+              @if (booking.createdAt) {
+                <p class="text-[12px] text-on-surface-variant">{{ booking.createdAt | date:'shortTime' }}</p>
+              }
+            </div>
+
+            <!-- Assigned Nurse -->
+            <div class="lg:col-span-3">
+              <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Nurse Assigned</p>
+              @if (booking.assignedProviderName) {
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-7 h-7 rounded-full bg-accent-teal/15 flex items-center justify-center text-[10px] font-bold text-teal-700 shrink-0"
+                    aria-hidden="true"
+                  >{{ booking.assignedProviderName | initials }}</div>
+                  <span class="text-body-md font-medium text-primary truncate">{{ booking.assignedProviderName }}</span>
+                </div>
+              } @else {
+                <button
+                  class="inline-flex items-center gap-1.5 bg-accent-teal/10 text-teal-700 border border-accent-teal/30 px-3 py-1.5 rounded-lg font-bold text-label-sm transition-all hover:bg-accent-teal/20 active:scale-95"
+                  aria-label="Assign nurse to this booking"
+                >
+                  <span class="material-symbols-outlined text-[16px]" aria-hidden="true">person_add</span>
+                  Assign Nurse
+                </button>
+              }
+            </div>
+
+            <!-- Status + Amount + Actions -->
+            <div class="lg:col-span-2 flex flex-col items-start lg:items-end gap-2">
+              <app-status-badge [status]="booking.status ?? 0" scheme="appointment" />
+              <p class="text-label-sm font-bold text-primary tabular-nums">{{ booking.totalAmount | appCurrency }}</p>
+              <div class="flex gap-1.5">
+                <button
+                  class="p-2 bg-surface-container-low rounded-lg hover:bg-primary/8 transition-colors text-on-surface-variant hover:text-primary"
+                  [attr.aria-label]="'View booking ' + booking.visitNumber"
+                  title="View booking"
+                >
+                  <span class="material-symbols-outlined text-[18px]" aria-hidden="true">visibility</span>
+                </button>
+                <button
+                  class="p-2 bg-surface-container-low rounded-lg hover:bg-primary/8 transition-colors text-on-surface-variant hover:text-primary"
+                  [attr.aria-label]="'More options for booking ' + booking.visitNumber"
+                  title="More options"
+                >
+                  <span class="material-symbols-outlined text-[18px]" aria-hidden="true">more_vert</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Address Footer -->
+          @if (booking.addressLabel) {
+            <div class="bg-surface-container-low/60 px-5 py-3 border-t border-outline-variant/15">
+              <div class="flex items-start gap-2">
+                <span class="material-symbols-outlined text-accent-teal mt-0.5 text-[16px]" aria-hidden="true">location_on</span>
+                <p class="text-[12px] text-on-surface-variant">{{ booking.addressLabel }}</p>
+              </div>
+            </div>
+          }
+
+        </article>
+      }
+    </div>
+
+    <!-- Pagination -->
+    <div class="bg-white rounded-2xl border border-outline-variant/20 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <p class="text-label-sm text-on-surface-variant">
+        Showing <span class="font-bold text-primary">{{ bookings().length }}</span> of
+        <span class="font-bold text-primary">{{ totalCount() }}</span> bookings
+      </p>
+      @if (totalPages() > 1) {
+        <nav class="flex items-center gap-1" aria-label="Bookings pagination">
+          <button
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/30 bg-white hover:bg-surface-container-low disabled:opacity-30 transition-colors"
+            [disabled]="page() === 0"
+            (click)="onPageChange(page() - 1)"
+            aria-label="Previous page"
+          >
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_left</span>
+          </button>
+
+          @for (p of pages(); track $index) {
+            @if (p === null) {
+              <span class="w-8 h-8 flex items-center justify-center text-on-surface-variant text-label-sm select-none">…</span>
+            } @else {
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border font-bold text-label-sm transition-colors"
+                [class]="p === page()
+                  ? 'border-primary bg-primary text-white'
+                  : 'border-outline-variant/30 bg-white hover:bg-surface-container-low text-on-surface-variant'"
+                (click)="onPageChange(p)"
+                [attr.aria-label]="'Page ' + (p + 1)"
+                [attr.aria-current]="p === page() ? 'page' : null"
+              >{{ p + 1 }}</button>
+            }
+          }
+
+          <button
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/30 bg-white hover:bg-surface-container-low disabled:opacity-30 transition-colors"
+            [disabled]="page() >= totalPages() - 1"
+            (click)="onPageChange(page() + 1)"
+            aria-label="Next page"
+          >
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_right</span>
+          </button>
+        </nav>
+      }
+    </div>
+  }
+
+</div>

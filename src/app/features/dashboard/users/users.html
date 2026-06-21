@@ -1,0 +1,242 @@
+<div class="flex flex-col gap-6">
+  <!-- ── Page header ──────────────────────────────────────────────────────── -->
+  <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-primary">User Management</h2>
+      <p class="text-sm text-on-surface-variant mt-1">
+        Manage and monitor platform access and activity.
+      </p>
+    </div>
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent-teal text-sm font-semibold text-white hover:bg-accent-teal/90 transition-colors focus:outline-none focus:ring-2 focus:ring-accent-teal/50 shrink-0 self-start"
+      (click)="onAddUser()"
+    >
+      <span class="material-symbols-outlined text-[16px]" aria-hidden="true">add</span>
+      Add New User
+    </button>
+  </div>
+
+  <!-- ── KPI cards ─────────────────────────────────────────────────────────── -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <app-stat-card
+      icon="group"
+      label="Total Users"
+      [value]="totalUsersFormatted()"
+      [badge]="growthBadge()"
+      [badgePositive]="growthPositive()"
+      variant="default"
+    />
+    <app-stat-card icon="block" label="Blocked Accounts" [value]="blockedCount()" variant="error" />
+  </div>
+
+  <!-- ── Error banner ──────────────────────────────────────────────────────── -->
+  @if (error()) {
+    <div
+      role="alert"
+      class="flex items-center gap-2 rounded-xl bg-error/10 border border-error/20 px-4 py-3 text-sm text-error"
+    >
+      <span class="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- ── Generic table ─────────────────────────────────────────────────────── -->
+  <app-generic-table
+    [data]="users()"
+    [columns]="cols"
+    [totalRecords]="totalCount()"
+    [isLoading]="isLoading()"
+    [pageSize]="pageSize"
+    [activeStates]="userActiveStates()"
+    [togglingId]="togglingUserId()"
+    [(page)]="page"
+    [(search)]="search"
+    exportFileName="users"
+    emptyIcon="group"
+    emptyMessage="No users found"
+    (onLazyLoadEvent)="onPageChange($event)"
+    (onSearch)="onSearch($event)"
+    (onRowClick)="openDetail($event)"
+    (onEdit)="openDetail($event)"
+    (onDelete)="onDeleteUser($event)"
+    (onToggleBlock)="onToggleBlock($event)"
+  />
+</div>
+
+<!-- ── Modals ────────────────────────────────────────────────────────────── -->
+
+<app-user-detail-modal
+  [isOpen]="isModalOpen()"
+  [user]="selectedUser()"
+  [isActive]="selectedUser()?.isActive ?? true"
+  [isDetailLoading]="isDetailLoading()"
+  [isEditingMode]="isEditingMode()"
+  [editForm]="editForm"
+  [isSaving]="isSaving()"
+  (close)="closeDetail()"
+  (enterEdit)="enterEditMode()"
+  (cancelEdit)="cancelEdit()"
+  (saveEdit)="saveEdit()"
+/>
+
+<app-confirmation-modal
+  [isOpen]="isDeleteOpen()"
+  title="Delete User"
+  [message]="
+    'Permanently delete ' +
+    (deleteConfirmUser()?.fullName ?? 'this user') +
+    '? This action cannot be undone.'
+  "
+  confirmLabel="Delete"
+  confirmingLabel="Deleting…"
+  variant="danger"
+  icon="delete_forever"
+  [isConfirming]="deletingUserId() !== null"
+  (confirm)="confirmDelete()"
+  (cancel)="closeDeleteConfirm()"
+/>
+
+<app-modal
+  [isOpen]="isRegisterModalOpen()"
+  size="md"
+  labelledBy="register-patient-title"
+  (close)="closeRegisterModal()"
+>
+  <div class="flex items-center gap-3" header>
+    <div
+      class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0"
+      aria-hidden="true"
+    >
+      <span class="material-symbols-outlined text-white text-[20px]">person_add</span>
+    </div>
+    <div>
+      <p class="text-[11px] font-semibold text-white/60 uppercase tracking-widest">
+        New Patient Account
+      </p>
+      <h2 id="register-patient-title" class="font-bold text-white text-base leading-tight">
+        Register New Patient
+      </h2>
+    </div>
+  </div>
+
+  <form
+    id="register-patient-form"
+    [formGroup]="registerForm"
+    (ngSubmit)="submitRegister()"
+    class="px-6 py-5 flex flex-col gap-3"
+    novalidate
+    body
+  >
+    <div>
+      <label
+        for="reg-name"
+        class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block"
+      >
+        Full Name <span class="text-error" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="reg-name"
+        type="text"
+        formControlName="fullName"
+        class="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-3.5 py-2.5 text-sm text-primary placeholder:text-on-surface-variant/40 outline-none transition focus:ring-2 focus:ring-primary/30 focus:border-primary/60"
+        placeholder="John Doe"
+        autocomplete="name"
+      />
+    </div>
+    <div>
+      <label
+        for="reg-password"
+        class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block"
+      >
+        Password <span class="text-error" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="reg-password"
+        type="password"
+        formControlName="password"
+        class="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-3.5 py-2.5 text-sm text-primary placeholder:text-on-surface-variant/40 outline-none transition focus:ring-2 focus:ring-primary/30 focus:border-primary/60"
+        placeholder="••••••••"
+        autocomplete="new-password"
+      />
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label
+          for="reg-phone"
+          class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block"
+        >
+          Phone Number
+        </label>
+        <input
+          id="reg-phone"
+          type="tel"
+          formControlName="phoneNumber"
+          class="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-3.5 py-2.5 text-sm text-primary placeholder:text-on-surface-variant/40 outline-none transition focus:ring-2 focus:ring-primary/30 focus:border-primary/60"
+          placeholder="+1..."
+          autocomplete="tel"
+        />
+      </div>
+      <div>
+        <label
+          for="reg-gender"
+          class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block"
+        >
+          Gender
+        </label>
+        <select
+          id="reg-gender"
+          formControlName="gender"
+          class="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-3.5 py-2.5 text-sm text-primary outline-none transition focus:ring-2 focus:ring-primary/30 focus:border-primary/60"
+        >
+          <option value="0">Male</option>
+          <option value="1">Female</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <label
+        for="reg-dob"
+        class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block"
+      >
+        Date of Birth
+      </label>
+      <input
+        id="reg-dob"
+        type="date"
+        formControlName="dateOfBirth"
+        class="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-3.5 py-2.5 text-sm text-primary outline-none transition focus:ring-2 focus:ring-primary/30 focus:border-primary/60"
+      />
+    </div>
+  </form>
+
+  <div class="px-6 pb-5 flex gap-3" footer>
+    <button
+      type="button"
+      class="flex-1 py-2.5 rounded-xl border border-outline-variant font-semibold text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors focus:outline-none focus:ring-2 focus:ring-outline"
+      (click)="closeRegisterModal()"
+    >
+      Cancel
+    </button>
+    <button
+      type="submit"
+      form="register-patient-form"
+      class="flex-1 py-2.5 rounded-xl bg-accent-teal text-white font-semibold text-sm hover:bg-accent-teal/90 transition-colors focus:outline-none focus:ring-2 focus:ring-accent-teal/40 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+      [disabled]="isRegistering()"
+    >
+      @if (isRegistering()) {
+        <span
+          class="material-symbols-outlined text-[16px] animate-spin pointer-events-none"
+          aria-hidden="true"
+          >progress_activity</span
+        >
+        Registering…
+      } @else {
+        <span class="material-symbols-outlined text-[16px] pointer-events-none" aria-hidden="true"
+          >person_add</span
+        >
+        Register Patient
+      }
+    </button>
+  </div>
+</app-modal>

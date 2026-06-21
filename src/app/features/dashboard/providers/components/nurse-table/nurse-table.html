@@ -1,0 +1,107 @@
+<table class="w-full text-left">
+  <thead>
+    <tr class="bg-surface-container-low/60">
+      <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Nurse</th>
+      <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider hidden md:table-cell">Email</th>
+      <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Rating</th>
+      <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Account Status</th>
+      <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Is Active</th>
+      <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider hidden lg:table-cell">Joined</th>
+      <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+    </tr>
+  </thead>
+
+  <tbody class="divide-y divide-outline-variant/15">
+    @for (nurse of nurses(); track nurse.id) {
+      <tr
+        class="hover:bg-surface-container-low/30 transition-colors"
+        [class.opacity-60]="isToggling(nurse)"
+        [class.pointer-events-none]="isToggling(nurse)"
+      >
+
+        <!-- Identity -->
+        <td class="px-5 py-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary border border-outline-variant/20 shrink-0"
+              aria-hidden="true"
+            >{{ nurse.fullName | initials }}</div>
+            <div class="min-w-0">
+              <span class="font-semibold text-primary text-body-md truncate block">{{ nurse.fullName ?? '—' }}</span>
+              <span class="text-[11px] text-on-surface-variant font-mono">{{ nurse.id?.slice(0, 8)?.toUpperCase() }}</span>
+            </div>
+          </div>
+        </td>
+
+        <!-- Email -->
+        <td class="px-5 py-4 text-body-md text-on-surface-variant truncate max-w-40 hidden md:table-cell">
+          {{ nurse.email ?? '—' }}
+        </td>
+
+        <!-- Rating -->
+        <td class="px-5 py-4">
+          @if (nurse.ratingAverage) {
+            <div class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings: 'FILL' 1" aria-hidden="true">star</span>
+              <span class="font-bold text-primary text-body-md">{{ nurse.ratingAverage.toFixed(1) }}</span>
+              <span class="text-[11px] text-on-surface-variant">({{ nurse.ratingCount ?? 0 }})</span>
+            </div>
+          } @else {
+            <span class="text-[12px] text-on-surface-variant">No ratings</span>
+          }
+        </td>
+
+        <!-- Account Status — reactive via getStatus() which reads nurseActiveStates map -->
+        <td class="px-5 py-4">
+          @if (isToggling(nurse)) {
+            <span
+              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-surface-container-low text-on-surface-variant"
+              aria-live="polite"
+              aria-label="Updating account status"
+            >
+              <span class="material-symbols-outlined text-[12px] animate-spin" aria-hidden="true">progress_activity</span>
+              Updating…
+            </span>
+          } @else {
+            <app-status-badge [status]="getStatus(nurse)" scheme="provider" />
+          }
+        </td>
+
+        <!-- Is Active (nurse's own online/offline availability — not the admin block state) -->
+        <td class="px-5 py-4">
+          <app-status-badge [status]="nurse.isAvailable ? 'active' : 'inactive'" scheme="provider" />
+        </td>
+
+        <!-- Joined -->
+        <td class="px-5 py-4 text-body-md text-on-surface-variant hidden lg:table-cell">
+          {{ nurse.createdAt | appDate }}
+        </td>
+
+        <!-- Actions -->
+        <td class="px-5 py-4">
+          <div class="flex items-center justify-end gap-1">
+
+            <!-- Primary: View Profile -->
+            <button
+              type="button"
+              class="w-10 h-10 inline-flex items-center justify-center rounded-xl hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-primary"
+              [attr.aria-label]="'View profile of ' + nurse.fullName"
+              title="View profile"
+              (click)="viewProfile.emit(nurse)"
+            >
+              <span class="material-symbols-outlined text-[18px] pointer-events-none" aria-hidden="true">visibility</span>
+            </button>
+
+            <!-- Context menu — block item disabled while toggling -->
+            <app-row-actions-menu
+              [items]="getMenuItems(nurse)"
+              (itemClick)="onMenuAction($event, nurse)"
+            />
+
+          </div>
+        </td>
+
+      </tr>
+    }
+  </tbody>
+</table>

@@ -1,0 +1,311 @@
+<div class="p-6 space-y-6">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-primary">Admin Accounts</h1>
+      <p class="text-sm text-on-surface-variant mt-0.5">Manage internal staff with system access</p>
+    </div>
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:opacity-90 transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      (click)="openCreateModal()"
+    >
+      <span class="material-symbols-outlined text-[18px] pointer-events-none" aria-hidden="true">person_add</span>
+      Add Admin
+    </button>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <app-stat-card
+      icon="manage_accounts"
+      label="Total Admins"
+      [value]="totalCount()"
+      variant="primary"
+    />
+    <app-stat-card
+      icon="check_circle"
+      label="Active"
+      [value]="activeCount()"
+      variant="teal"
+    />
+    <app-stat-card
+      icon="block"
+      label="Inactive"
+      [value]="totalCount() - activeCount()"
+      variant="error"
+    />
+  </div>
+
+  <!-- Search -->
+  <div class="relative max-w-sm">
+    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant pointer-events-none" aria-hidden="true">search</span>
+    <input
+      type="search"
+      placeholder="Search by name, email, username…"
+      class="w-full pl-10 pr-4 py-2.5 bg-white border border-outline-variant rounded-xl text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition"
+      [value]="search()"
+      (input)="onSearch($any($event.target).value)"
+      aria-label="Search admins"
+    />
+  </div>
+
+  <!-- Table -->
+  <div class="rounded-2xl border border-outline-variant/20 bg-white overflow-hidden shadow-sm">
+
+    @if (isLoading()) {
+      <div class="flex items-center justify-center py-16 gap-3 text-on-surface-variant">
+        <span class="material-symbols-outlined animate-spin text-[22px]" aria-hidden="true">progress_activity</span>
+        <span class="text-sm font-medium">Loading admins…</span>
+      </div>
+    } @else if (users().length === 0) {
+      <div class="flex flex-col items-center justify-center py-16 gap-3 text-on-surface-variant">
+        <span class="material-symbols-outlined text-[48px] opacity-30" aria-hidden="true">manage_accounts</span>
+        <p class="text-sm font-medium">No admins found</p>
+        @if (search()) {
+          <p class="text-xs">Try clearing your search filter</p>
+        }
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" role="grid" aria-label="Admin accounts">
+          <thead>
+            <tr class="border-b border-outline-variant/20 bg-surface-container-low">
+              <th scope="col" class="px-5 py-3.5 text-left text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Admin</th>
+              <th scope="col" class="px-5 py-3.5 text-left text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Username</th>
+              <th scope="col" class="px-5 py-3.5 text-left text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Email</th>
+              <th scope="col" class="px-5 py-3.5 text-left text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Status</th>
+              <th scope="col" class="px-5 py-3.5 text-right text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users(); track user.id) {
+              <tr class="border-b border-outline-variant/10 hover:bg-surface-container-low/50 transition-colors">
+                <!-- Admin name + avatar -->
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0" aria-hidden="true">
+                      <span class="text-primary font-bold text-sm">{{ (displayName(user))[0]?.toUpperCase() ?? '?' }}</span>
+                    </div>
+                    <span class="font-semibold text-on-surface">{{ displayName(user) }}</span>
+                  </div>
+                </td>
+
+                <!-- Username -->
+                <td class="px-5 py-4 text-on-surface-variant font-mono text-xs">
+                  {{ user.userName ?? '—' }}
+                </td>
+
+                <!-- Email -->
+                <td class="px-5 py-4 text-on-surface-variant">
+                  {{ user.email ?? '—' }}
+                </td>
+
+                <!-- Status -->
+                <td class="px-5 py-4">
+                  @if (user.isActive) {
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500" aria-hidden="true"></span>
+                      Active
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600">
+                      <span class="w-1.5 h-1.5 rounded-full bg-red-400" aria-hidden="true"></span>
+                      Inactive
+                    </span>
+                  }
+                </td>
+
+                <!-- Actions -->
+                <td class="px-5 py-4">
+                  <div class="flex items-center justify-end gap-1">
+                    <button
+                      type="button"
+                      class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      (click)="openEditModal(user)"
+                      [attr.aria-label]="'Edit ' + displayName(user)"
+                    >
+                      <span class="material-symbols-outlined text-[17px] pointer-events-none" aria-hidden="true">edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error"
+                      (click)="openDeleteConfirm(user)"
+                      [attr.aria-label]="'Delete ' + displayName(user)"
+                    >
+                      <span class="material-symbols-outlined text-[17px] pointer-events-none" aria-hidden="true">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages() > 1) {
+        <div class="flex items-center justify-between px-5 py-4 border-t border-outline-variant/10">
+          <p class="text-xs text-on-surface-variant">
+            Showing {{ page() * pageSize + 1 }}–{{ [page() * pageSize + users().length, totalCount()] | min }} of {{ totalCount() }}
+          </p>
+          <nav class="flex items-center gap-1" aria-label="Pagination">
+            <button
+              type="button"
+              class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              [disabled]="page() === 0"
+              (click)="onPageChange(page() - 1)"
+              aria-label="Previous page"
+            >
+              <span class="material-symbols-outlined text-[18px] pointer-events-none" aria-hidden="true">chevron_left</span>
+            </button>
+            @for (p of pages(); track $index) {
+              @if (p === null) {
+                <span class="w-8 h-8 flex items-center justify-center text-on-surface-variant text-xs" aria-hidden="true">…</span>
+              } @else {
+                <button
+                  type="button"
+                  class="w-8 h-8 rounded-lg text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  [class]="p === page() ? 'bg-primary text-white' : 'text-on-surface-variant hover:bg-surface-container'"
+                  (click)="onPageChange(p)"
+                  [attr.aria-label]="'Page ' + (p + 1)"
+                  [attr.aria-current]="p === page() ? 'page' : null"
+                >{{ p + 1 }}</button>
+              }
+            }
+            <button
+              type="button"
+              class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              [disabled]="page() === totalPages() - 1"
+              (click)="onPageChange(page() + 1)"
+              aria-label="Next page"
+            >
+              <span class="material-symbols-outlined text-[18px] pointer-events-none" aria-hidden="true">chevron_right</span>
+            </button>
+          </nav>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- Create Admin Modal -->
+<app-modal
+  [isOpen]="showCreateModal()"
+  size="lg"
+  labelledBy="admin-create-title"
+  (close)="closeCreateModal()"
+>
+  <div class="flex items-center gap-3" header>
+    <div
+      class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0"
+      aria-hidden="true"
+    >
+      <span class="material-symbols-outlined text-white text-[20px]">person_add</span>
+    </div>
+    <div>
+      <p class="text-[11px] font-semibold text-white/60 uppercase tracking-widest">System Access</p>
+      <h2 id="admin-create-title" class="font-bold text-white text-base leading-tight">Add Admin Account</h2>
+    </div>
+  </div>
+
+  <div class="px-6 py-5" body>
+    <app-admin-create-form
+      [admin]="null"
+      [isOpen]="showCreateModal()"
+      (adminSaved)="onAdminSaved()"
+      (closed)="closeCreateModal()"
+    />
+  </div>
+
+  <div class="px-6 pb-5 flex gap-3" footer>
+    <button
+      type="button"
+      class="flex-1 py-2.5 rounded-xl border border-outline-variant font-semibold
+             text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors
+             focus:outline-none focus:ring-2 focus:ring-outline"
+      (click)="closeCreateModal()"
+    >Cancel</button>
+    <button
+      type="submit"
+      form="admin-create-form"
+      class="flex-1 py-2.5 rounded-xl bg-accent-teal text-white font-semibold text-sm
+             hover:bg-accent-teal/90 transition-colors
+             focus:outline-none focus:ring-2 focus:ring-accent-teal/40
+             inline-flex items-center justify-center gap-2"
+    >
+      <span class="material-symbols-outlined text-[16px] pointer-events-none" aria-hidden="true">person_add</span>
+      Create Admin
+    </button>
+  </div>
+</app-modal>
+
+<!-- Edit Admin Modal -->
+<app-modal
+  [isOpen]="!!editingUser()"
+  size="lg"
+  labelledBy="admin-edit-title"
+  (close)="closeEditModal()"
+>
+  <div class="flex items-center gap-3" header>
+    <div
+      class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0"
+      aria-hidden="true"
+    >
+      <span class="material-symbols-outlined text-white text-[20px]">manage_accounts</span>
+    </div>
+    <div class="min-w-0">
+      <p class="text-[11px] font-semibold text-white/60 uppercase tracking-widest">Admin Account</p>
+      <h2 id="admin-edit-title" class="font-bold text-white text-base leading-tight truncate">
+        {{ editingUser() ? 'Edit ' + displayName(editingUser()!) : 'Edit Admin' }}
+      </h2>
+    </div>
+  </div>
+
+  <div class="px-6 py-5" body>
+    @if (editingUser()) {
+      <app-admin-create-form
+        [admin]="editingUser()"
+        [isOpen]="true"
+        (adminSaved)="onAdminSaved()"
+        (closed)="closeEditModal()"
+      />
+    }
+  </div>
+
+  <div class="px-6 pb-5 flex gap-3" footer>
+    <button
+      type="button"
+      class="flex-1 py-2.5 rounded-xl border border-outline-variant font-semibold
+             text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors
+             focus:outline-none focus:ring-2 focus:ring-outline"
+      (click)="closeEditModal()"
+    >Cancel</button>
+    <button
+      type="submit"
+      form="admin-create-form"
+      class="flex-1 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm
+             hover:opacity-90 transition-all
+             focus:outline-none focus:ring-2 focus:ring-primary/40
+             inline-flex items-center justify-center gap-2"
+    >
+      <span class="material-symbols-outlined text-[16px] pointer-events-none" aria-hidden="true">save</span>
+      Save Changes
+    </button>
+  </div>
+</app-modal>
+
+<!-- Delete Confirmation -->
+<app-confirmation-modal
+  [isOpen]="!!deleteTarget()"
+  title="Delete Admin Account"
+  [message]="'Permanently delete ' + (deleteTarget()?.userName ?? 'this admin') + '? This action cannot be undone.'"
+  confirmLabel="Delete"
+  confirmingLabel="Deleting…"
+  icon="person_remove"
+  variant="danger"
+  [isConfirming]="isDeleting()"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+/>

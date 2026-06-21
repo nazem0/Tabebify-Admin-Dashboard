@@ -1,0 +1,49 @@
+<app-generic-modal [isOpen]="isOpen()" [title]="service() ? 'Edit Service' : 'Add Service'" size="sm"
+    (onClose)="handleClose()">
+    <form [formGroup]="form" id="service-form" modal-body (ngSubmit)="onSubmit()" class="space-y-5" novalidate
+        aria-label="Add or Edit service form">
+        <app-form-field label="Service Name" fieldId="srv-name" [control]="form.controls.name" type="text"
+            placeholder="e.g. Standard Consultation" [required]="true" errorMessage="Service name is required." />
+
+        <div class="grid grid-cols-2 gap-4">
+            <app-form-field label="Base Price ($)" fieldId="srv-price" [control]="form.controls.price" type="number"
+                placeholder="0.00" [required]="true" errorMessage="A valid price > 0 is required." />
+
+            <app-form-field label="Standard Duration (Min)" fieldId="srv-duration"
+                [control]="form.controls.durationMinutes" type="number" placeholder="30" [required]="true"
+                errorMessage="Valid duration > 0 required." />
+        </div>
+
+        <div>
+            <div class="flex items-center justify-between gap-4">
+                <span class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+                    Active Service
+                </span>
+                <button type="button" role="switch" [attr.aria-checked]="form.controls.isVerified.value"
+                    (click)="form.controls.isVerified.setValue(!form.controls.isVerified.value)"
+                    class="w-10 h-5 rounded-full relative cursor-pointer shadow-inner transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent-teal/50 shrink-0"
+                    [class]="form.controls.isVerified.value ? 'bg-accent-teal' : 'bg-outline-variant'">
+                    <span class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all duration-200"
+                        [class]="form.controls.isVerified.value ? 'left-[22px]' : 'left-0.5'" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div modal-footer class="flex gap-3 justify-end">
+        <button type="button" (click)="handleClose()"
+            class="px-5 py-2 rounded-xl border border-outline-variant font-semibold text-body-md text-on-surface-variant hover:bg-surface-container-low transition-colors focus:outline-none">
+            Cancel
+        </button>
+
+        <button type="submit" form="service-form" [disabled]="isSubmitting()"
+            class="px-6 py-2 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 disabled:opacity-60 transition-all inline-flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/40">
+            @if (isSubmitting()) {
+            <span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+            Saving...
+            } @else {
+            {{ service() ? 'Save Changes' : 'Create Service' }}
+            }
+        </button>
+    </div>
+</app-generic-modal>

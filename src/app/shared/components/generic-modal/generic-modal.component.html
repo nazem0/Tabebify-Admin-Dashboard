@@ -1,0 +1,84 @@
+@if (isOpen()) {
+  <!--
+    Outer shell: layout only — does NOT handle click itself.
+    The backdrop div below captures overlay clicks so the modal card
+    never needs stopPropagation().
+  -->
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="titleId"
+  >
+
+    <!-- ── Backdrop ─────────────────────────────────────────────────────── -->
+    <!--
+      starting: classes use CSS @starting-style (Tailwind v4+) to set the
+      "from" state on first paint, allowing a smooth fade-in entry.
+      No exit animation — element is removed immediately by @if.
+    -->
+    <div
+      class="absolute inset-0 bg-black/50 backdrop-blur-sm
+             opacity-100 transition-opacity duration-300
+             starting:opacity-0"
+      aria-hidden="true"
+      (click)="handleOverlayClick()"
+    ></div>
+
+    <!-- ── Modal card ───────────────────────────────────────────────────── -->
+    <!--
+      z-10 lifts the card above the backdrop.
+      starting: applies scale-95 + opacity-0 on first paint → CSS transitions
+      animate it to scale-100 + opacity-100 over 300 ms.
+      max-h-[90vh] + flex-col keeps header/footer pinned while body scrolls.
+    -->
+    <div
+      class="relative z-10 flex flex-col w-full
+             bg-surface border border-outline-variant rounded-2xl shadow-2xl
+             max-h-[90vh] overflow-hidden
+             opacity-100 scale-100 transition-all duration-300 ease-out
+             starting:opacity-0 starting:scale-95"
+      [class]="panelClass()"
+      tabindex="-1"
+    >
+
+      <!-- Header — hidden when showHeader()=false (e.g. MasterDetailModal) ── -->
+      @if (showHeader()) {
+        <header
+          class="flex items-center justify-between gap-4 px-6 py-4
+                 border-b border-outline-variant shrink-0"
+        >
+          <h2
+            [id]="titleId"
+            class="text-lg font-bold text-primary truncate"
+          >{{ title() }}</h2>
+
+          <button
+            type="button"
+            class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg
+                   text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface
+                   transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20"
+            aria-label="Close dialog"
+            (click)="onClose.emit()"
+          >
+            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">close</span>
+          </button>
+        </header>
+      }
+
+      <!-- Body — scrolls independently; header & footer stay pinned ────── -->
+      <div class="flex-1 min-h-0 overflow-y-auto px-6 py-5">
+        <ng-content select="[modal-body]" />
+      </div>
+
+      <!-- Footer — action buttons (Save, Cancel, etc.) ─────────────────── -->
+      <footer
+        class="shrink-0 px-6 py-4 border-t border-outline-variant
+               bg-surface-container-lowest"
+      >
+        <ng-content select="[modal-footer]" />
+      </footer>
+
+    </div>
+  </div>
+}

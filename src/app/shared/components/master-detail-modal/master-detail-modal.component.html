@@ -1,0 +1,167 @@
+<!--
+  GenericModalComponent provides the backdrop, card shell, animation, and
+  keyboard/overlay-close handling.  showHeader="false" suppresses its built-in
+  title bar so this component can own the entire top of the card.
+
+  closeOnOverlayClick is disabled in edit mode to prevent accidental data loss.
+-->
+<app-generic-modal
+  [isOpen]="isOpen()"
+  size="xl"
+  [showHeader]="false"
+  [closeOnOverlayClick]="!isEditingMode()"
+  (onClose)="onClose.emit()"
+>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       BODY  —  colorful header bleeds edge-to-edge, content below scrolls
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div modal-body>
+
+    <!--
+      Full-bleed colorful header.
+      -mx-6 -mt-5 cancels the generic-modal body's px-6 py-5 padding so the
+      header stretches to the card edges. The card's rounded-2xl overflow-hidden
+      automatically clips the corners. sticky top-0 keeps it visible on scroll.
+    -->
+    <header
+      class="-mx-6 -mt-5 mb-6 bg-primary px-6 py-5
+             flex items-start justify-between gap-4
+             sticky top-0 z-10"
+      [attr.aria-labelledby]="titleId"
+    >
+      <!-- Title block -->
+      <div class="min-w-0 flex-1">
+        @if (subtitle()) {
+          <p class="text-xs font-semibold text-on-primary/60 uppercase tracking-widest mb-1">
+            {{ subtitle() }}
+          </p>
+        }
+
+        <div class="flex items-center gap-2">
+          @if (isEditingMode()) {
+            <!-- Edit-mode indicator chip -->
+            <span
+              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
+                     bg-white/15 text-on-primary text-[10px] font-bold uppercase tracking-widest shrink-0"
+              aria-hidden="true"
+            >
+              <span class="material-symbols-outlined text-[12px]">edit</span>
+              Editing
+            </span>
+          }
+          <h2
+            [id]="titleId"
+            class="text-xl font-bold text-on-primary truncate"
+          >{{ headerTitle() }}</h2>
+        </div>
+      </div>
+
+      <!-- Close button (always visible regardless of mode) -->
+      <button
+        type="button"
+        class="w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-xl
+               text-on-primary/70 hover:bg-white/15 hover:text-on-primary
+               transition-colors focus:outline-none focus:ring-2 focus:ring-white/40"
+        aria-label="Close dialog"
+        (click)="onClose.emit()"
+      >
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">close</span>
+      </button>
+    </header>
+
+    <!--
+      Dynamic workspace — only one slot is in the DOM at a time.
+      Angular's @if correctly mounts/unmounts ng-content slots in v17+:
+        • Unmounted content exists in the parent's view but is not in the DOM.
+        • No double-instantiation; form state in the parent FormGroup is preserved.
+    -->
+    @if (!isEditingMode()) {
+      <ng-content select="[read-content]" />
+    } @else {
+      <ng-content select="[edit-content]" />
+    }
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       FOOTER  —  fixed action bar, buttons switch with isEditingMode
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div modal-footer>
+    <div class="flex items-center justify-end gap-2">
+
+      @if (!isEditingMode()) {
+        <!-- ── Read-only mode ─────────────────────────────────────────────── -->
+
+        <button
+          type="button"
+          class="px-4 py-2 text-sm font-semibold text-on-surface-variant rounded-xl
+                 border border-outline-variant
+                 hover:bg-surface-container-low transition-colors
+                 focus:outline-none focus:ring-2 focus:ring-primary/20"
+          (click)="onClose.emit()"
+        >Close</button>
+
+        <button
+          type="button"
+          class="px-5 py-2 text-sm font-semibold text-on-primary bg-primary rounded-xl
+                 hover:bg-primary/90 transition-colors
+                 inline-flex items-center gap-2
+                 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          (click)="onEnterEdit.emit()"
+        >
+          <span class="material-symbols-outlined text-[16px]" aria-hidden="true">edit</span>
+          Edit Details
+        </button>
+
+      } @else {
+        <!-- ── Edit mode ──────────────────────────────────────────────────── -->
+
+        <button
+          type="button"
+          class="px-4 py-2 text-sm font-semibold text-on-surface-variant rounded-xl
+                 border border-outline-variant
+                 hover:bg-surface-container-low transition-colors
+                 focus:outline-none focus:ring-2 focus:ring-primary/20"
+          (click)="onCancelEdit.emit()"
+        >Cancel</button>
+
+        <!--
+          type="submit" + [attr.form] bridges this button to the <form> projected
+          inside [edit-content] without nesting the button inside the form tag.
+          Native form validation runs, then Angular's (ngSubmit) fires.
+          onSave.emit() signals the parent before the DOM submit propagates —
+          use one or the other in the parent, not both, to avoid double-execution.
+        -->
+        <button
+          type="submit"
+          [attr.form]="formId()"
+          [disabled]="isSaving()"
+          class="px-5 py-2 text-sm font-semibold text-on-primary bg-primary rounded-xl
+                 hover:bg-primary/90 disabled:opacity-50 transition-colors
+                 inline-flex items-center gap-2
+                 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          (click)="onSave.emit()"
+        >
+          @if (isSaving()) {
+            <svg
+              class="animate-spin w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-label="Saving…"
+            >
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+            Saving…
+          } @else {
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">save</span>
+            Save Changes
+          }
+        </button>
+
+      }
+    </div>
+  </div>
+
+</app-generic-modal>

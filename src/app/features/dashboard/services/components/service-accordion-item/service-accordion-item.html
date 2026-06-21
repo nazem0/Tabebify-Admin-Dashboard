@@ -1,0 +1,59 @@
+<div class="rounded-xl border border-outline-variant/30 overflow-hidden">
+    <div class="w-full flex items-center justify-between p-4 transition-colors text-left"
+        [class]="isExpanded() ? 'bg-primary text-white' : 'bg-surface-container-lowest text-primary'">
+        <div class="flex items-center gap-3 min-w-0 cursor-pointer flex-1" (click)="expand.emit(category().id!)">
+            <span class="material-symbols-outlined text-[20px] shrink-0 transition-transform duration-200"
+                [class]="isExpanded() ? 'text-white rotate-180' : 'text-on-surface-variant/60'">expand_more</span>
+            <span class="font-bold text-body-md truncate">{{ category().name }}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0"
+                [class]="isExpanded() ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'">
+                {{ category().serviceCount ?? 0 }} Services
+            </span>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0 ml-2">
+            <app-row-actions-menu [items]="menuItems" (itemClick)="onMenuAction($event)" />
+        </div>
+    </div>
+
+    @if (isExpanded()) {
+    <div [id]="panelId()" role="list" class="flex flex-col bg-surface-container-lowest">
+        @if (isLoadingServices()) {
+        <div class="p-4 space-y-2 animate-pulse">
+            <div class="h-10 bg-surface-container-low rounded-lg"></div>
+        </div>
+        } @else if (services().length === 0) {
+        <div class="py-6 px-5 text-center text-on-surface-variant/40 text-label-sm flex flex-col items-center gap-2">
+            <span>No services in this category</span>
+            <button type="button" (click)="createService.emit(category().id!)"
+                class="text-accent-teal font-bold hover:underline flex items-center gap-1 text-[12px]">
+                <span class="material-symbols-outlined text-[16px]">add</span> Add First Service
+            </button>
+        </div>
+        } @else {
+        @for (service of services(); track service.id) {
+        <button type="button" (click)="serviceSelect.emit(service.id!)"
+            class="w-full flex items-center justify-between px-5 py-3 text-left transition-colors border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low"
+            [class]="selectedServiceId() === service.id ? 'bg-accent-teal/10 border-l-2 border-l-accent-teal' : ''">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-[18px] text-on-surface-variant/50">{{ service.iconUrl ||
+                    'medical_services' }}</span>
+                <span class="text-body-md font-bold text-primary">{{ service.name }}</span>
+            </div>
+            <span class="text-label-sm text-on-surface-variant/40 font-bold uppercase">
+                {{ service.isVerified ? 'Active' : 'Inactive' }}
+            </span>
+        </button>
+        }
+
+        <div class="p-2 border-t border-outline-variant/10 bg-surface-container-low/10 flex justify-center">
+            <button type="button" (click)="createService.emit(category().id!)"
+                class="w-full py-2 text-primary font-bold hover:bg-primary/5 transition-colors text-label-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                Add Another Service
+            </button>
+        </div>
+        }
+    </div>
+    }
+</div>

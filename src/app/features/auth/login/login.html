@@ -1,0 +1,85 @@
+<div class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style="background-color: #E5ECF2 ;">
+  <!-- Decorative arc -->
+  <div
+    class="absolute top-0 inset-x-0 h-[25vh] bg-primary"
+    style="border-bottom-left-radius: 50% 100%; border-bottom-right-radius: 50% 100%"
+    aria-hidden="true"
+  >
+    <app-logo class="absolute bottom-7 left-1/2 -translate-x-1/2"/>
+  </div>
+
+  <main class="relative z-10 w-full max-w-[440px] flex flex-col items-center mt-7">
+    <!-- Login card -->
+    <div class="w-full bg-white rounded-[2rem] px-8 py-10 shadow-xl shadow-primary/5">
+      <header class="mb-8 text-center">
+        <h1 class="text-[2rem] font-bold tracking-tight text-primary leading-10">Welcome back</h1>
+        <p class="text-sm text-on-surface-variant mt-1">Access your healthcare dashboard</p>
+      </header>
+
+      <!-- Server error banner -->
+      @if (errorMessage()) {
+        <div
+          role="alert"
+          class="mb-5 flex items-center gap-2 rounded-xl bg-error/10 px-4 py-3 text-sm text-error"
+        >
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+        <!-- Username -->
+        <div>
+          <label for="username" class="sr-only">Username</label>
+          <app-form-input
+            inputId="username"
+            icon="person"
+            placeholder="Username"
+            type="text"
+            autocomplete="username"
+            [control]="controls.username"
+          />
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label for="password" class="sr-only">Password</label>
+          <app-form-input
+            inputId="password"
+            icon="lock"
+            placeholder="Password"
+            type="password"
+            autocomplete="current-password"
+            [control]="controls.password"
+          />
+        </div>
+
+        <!-- Remember Me / Forgot Password -->
+        <div class="flex items-center justify-between px-1">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              formControlName="rememberMe"
+              class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary transition-all"
+            />
+            <span class="text-sm text-on-surface-variant">Remember Me</span>
+          </label>
+          <a
+            routerLink="/auth/forgot-password"
+            class="text-sm text-on-surface-variant hover:text-primary transition-colors"
+            >Forgot Password?</a
+          >
+        </div>
+
+        <!-- Submit -->
+        <app-spinner-button
+          label="Login"
+          loadingLabel="Signing in…"
+          [isLoading]="isLoading()"
+          class="mt-2"
+        />
+      </form>
+
+    </div>
+  </main>
+</div>

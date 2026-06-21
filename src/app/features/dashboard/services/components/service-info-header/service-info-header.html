@@ -1,0 +1,53 @@
+<div class="p-6 border-b border-outline-variant bg-surface-container-lowest shrink-0">
+
+    <!-- Top row: breadcrumb  |  controls -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-1 text-label-sm font-bold uppercase tracking-widest
+                 text-on-surface-variant/50" aria-label="Service location">
+            <span>Categories</span>
+            <span class="material-symbols-outlined text-[13px]" aria-hidden="true">chevron_right</span>
+            @if (categoryName()) {
+            <span>{{ categoryName() }}</span>
+            <span class="material-symbols-outlined text-[13px]" aria-hidden="true">chevron_right</span>
+            }
+            <span class="text-primary font-bold">{{ serviceName() }}</span>
+        </nav>
+
+        <!-- Controls -->
+        <div class="flex items-center gap-4 shrink-0">
+            <!-- Status toggle -->
+            <div class="flex items-center gap-2">
+                <span id="service-status-label" class="text-label-sm font-bold text-on-surface-variant/70 uppercase">
+                    Service Status
+                </span>
+                <button type="button" role="switch" [attr.aria-checked]="isVerified()"
+                    aria-labelledby="service-status-label" (click)="statusToggle.emit(!isVerified())" class="w-10 h-5 rounded-full relative cursor-pointer shadow-inner transition-colors
+                     duration-200 focus:outline-none focus:ring-2 focus:ring-accent-teal/40"
+                    [class]="isVerified() ? 'bg-accent-teal' : 'bg-outline-variant'">
+                    <span class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all duration-200"
+                        [class]="isVerified() ? 'left-[22px]' : 'left-0.5'" aria-hidden="true"></span>
+                </button>
+            </div>
+
+            <!-- Edit Core Info -->
+            <button type="button" (click)="editCoreInfo.emit(serviceId())" class="bg-surface-container-lowest border border-outline-variant text-primary
+                   px-4 py-2 rounded-lg font-bold text-label-sm uppercase tracking-widest
+                   hover:bg-surface-container-low transition-colors
+                   focus:outline-none focus:ring-2 focus:ring-primary/20">
+                Edit Core Info
+            </button>
+        </div>
+    </div>
+
+    <!-- Service title + description -->
+    <div>
+        <h2 class="text-headline-lg font-headline-lg text-primary">{{ serviceName() }}</h2>
+        @if (serviceDescription()) {
+        <p class="text-body-lg text-on-surface-variant/70 mt-1 max-w-2xl">
+            {{ serviceDescription() }}
+        </p>
+        }
+    </div>
+</div>

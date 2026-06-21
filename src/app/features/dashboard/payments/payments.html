@@ -1,0 +1,286 @@
+<div class="p-gutter space-y-gutter max-w-360">
+
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg text-primary tracking-tight">Payments &amp; Finance</h2>
+      <p class="font-body-md text-on-surface-variant">Real-time revenue monitoring and transaction management.</p>
+    </div>
+    <button
+      class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl font-semibold text-body-md shadow-sm hover:opacity-90 active:scale-95 transition-all"
+      aria-label="Export finance report"
+    >
+      <span class="material-symbols-outlined text-[18px]" aria-hidden="true">file_download</span>
+      Export Report
+    </button>
+  </div>
+
+  <!-- Error Banner -->
+  @if (error()) {
+    <div role="alert" class="flex items-center gap-2 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
+      <span class="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Metrics Skeleton -->
+  @if (isLoading()) {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="animate-pulse rounded-2xl bg-surface-container-low h-36"></div>
+      }
+    </div>
+    <div class="animate-pulse rounded-2xl bg-surface-container-low h-80"></div>
+  } @else {
+
+    <!-- ── Metrics Row ── -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+
+      <app-stat-card
+        variant="primary"
+        icon="payments"
+        label="Total Revenue"
+        [value]="(wallet()?.totalEarned | appCurrency) ?? '—'"
+        [badge]="successRate() ?? ''"
+        subtitle="Appointment completion rate"
+        [badgePositive]="true"
+      />
+
+      <!-- Monthly Payouts — progress bar card -->
+      <div class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-6 flex flex-col justify-between gap-4">
+        <div>
+          <p class="font-label-sm text-label-sm text-on-surface-variant/60 uppercase tracking-widest mb-2">Monthly Payouts</p>
+          <p class="text-3xl font-bold tabular-nums text-primary">
+            {{ wallet()?.thisMonthEarnings | appCurrency }}
+          </p>
+        </div>
+        <div>
+          <div class="w-full bg-surface-container-low rounded-full h-2 mb-2" role="progressbar"
+               [attr.aria-valuenow]="payoutProgressPct()"
+               aria-valuemin="0" aria-valuemax="100"
+               [attr.aria-label]="payoutProgressPct() + '% of total earned this month'">
+            <div
+              class="bg-primary h-2 rounded-full transition-all duration-700"
+              [style.width.%]="payoutProgressPct()"
+            ></div>
+          </div>
+          <p class="text-label-sm text-on-surface-variant">
+            {{ payoutProgressPct() }}% of total earned disbursed this month
+          </p>
+        </div>
+      </div>
+
+      <app-stat-card
+        variant="error"
+        icon="account_balance_wallet"
+        label="Current Balance"
+        [value]="(wallet()?.currentBalance | appCurrency) ?? '—'"
+        subtitle="Available for withdrawal"
+      />
+
+    </div>
+
+    <!-- ── Transaction History ── -->
+    <section class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden">
+
+      <!-- Table Header -->
+      <div class="px-6 py-5 border-b border-outline-variant/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h3 class="font-headline-md text-headline-md text-primary">Transaction History</h3>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <div class="relative flex-1 sm:flex-none sm:w-64">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" aria-hidden="true">search</span>
+            <input
+              type="search"
+              class="w-full pl-9 pr-4 py-2 bg-surface-container-low border-none rounded-lg text-body-md focus:ring-2 focus:ring-accent-teal/40 outline-none"
+              placeholder="Search description or ID..."
+              [value]="search()"
+              (input)="onSearch($any($event.target).value)"
+              aria-label="Search transactions"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Body -->
+      @if (isLoadingTx()) {
+        <div class="p-6 space-y-4" aria-busy="true" aria-label="Loading transactions">
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div class="animate-pulse flex items-center gap-4">
+              <div class="w-20 h-4 bg-surface-container-low rounded"></div>
+              <div class="flex-1 h-4 bg-surface-container-low rounded"></div>
+              <div class="w-24 h-4 bg-surface-container-low rounded"></div>
+              <div class="w-20 h-6 bg-surface-container-low rounded-full"></div>
+            </div>
+          }
+        </div>
+      } @else if (filteredTransactions().length === 0) {
+        <div class="flex flex-col items-center justify-center py-16 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[48px] opacity-30" aria-hidden="true">receipt_long</span>
+          <p class="text-sm mt-3">No transactions found</p>
+          @if (search()) {
+            <button class="mt-2 text-sm text-accent-teal underline" (click)="onSearch('')">Clear search</button>
+          }
+        </div>
+      } @else {
+        <div class="overflow-x-auto" role="region" aria-label="Transaction history table" tabindex="0">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-surface-container-low/50">
+                <th scope="col" class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Date</th>
+                <th scope="col" class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Reference</th>
+                <th scope="col" class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Description</th>
+                <th scope="col" class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Amount</th>
+                <th scope="col" class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Type</th>
+                <th scope="col" class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/20">
+              @for (tx of filteredTransactions(); track tx.id) {
+                <tr class="hover:bg-surface-container-low/40 transition-colors group">
+
+                  <td class="px-6 py-5 text-body-md font-semibold text-primary">
+                    {{ tx.date | appDate }}
+                  </td>
+
+                  <td class="px-6 py-5">
+                    <p class="text-[11px] text-on-surface-variant font-mono">#{{ tx.id?.slice(0, 8)?.toUpperCase() }}</p>
+                  </td>
+
+                  <td class="px-6 py-5 text-body-md text-on-surface-variant max-w-xs truncate">
+                    {{ tx.description || '—' }}
+                  </td>
+
+                  <!-- Amount: withdrawals shown negative in error colour -->
+                  <td class="px-6 py-5 font-bold tabular-nums">
+                    <span [class]="tx.type === TxType.Withdrawal ? 'text-error' : 'text-primary'">
+                      {{ tx.type === TxType.Withdrawal ? '-' : '' }}{{ tx.amount | appCurrency }}
+                    </span>
+                  </td>
+
+                  <!-- Type badge — single txStyle() lookup replaces three separate switch statements -->
+                  <td class="px-6 py-5">
+                    <span
+                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider"
+                      [class]="txStyle(tx.type).badge"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full" [class]="txStyle(tx.type).dot" aria-hidden="true"></span>
+                      {{ txStyle(tx.type).label }}
+                    </span>
+                  </td>
+
+                  <td class="px-6 py-5 text-right">
+                    <button
+                      class="p-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors opacity-0 group-hover:opacity-100"
+                      [attr.aria-label]="'More options for transaction ' + tx.id?.slice(0, 8)"
+                      title="More options"
+                    >
+                      <span class="material-symbols-outlined text-[18px]" aria-hidden="true">more_vert</span>
+                    </button>
+                  </td>
+
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination — now supports ellipsis (null) from buildPageArray -->
+        @if (totalPages() > 1) {
+          <div class="px-6 py-4 bg-surface-container-low/30 border-t border-outline-variant/20 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <p class="text-label-sm text-on-surface-variant">
+              Showing <span class="font-bold text-primary">{{ (page() * pageSize) + 1 }}–{{ [((page() + 1) * pageSize), totalTransactions()] | min }}</span>
+              of <span class="font-bold text-primary">{{ totalTransactions() }}</span> transactions
+            </p>
+            <nav class="flex items-center gap-1" aria-label="Transaction pagination">
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/30 bg-white hover:bg-surface-container-low disabled:opacity-30 transition-colors"
+                [disabled]="page() === 0"
+                (click)="onPageChange(page() - 1)"
+                aria-label="Previous page"
+              >
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_left</span>
+              </button>
+
+              @for (p of pages(); track $index) {
+                @if (p === null) {
+                  <span class="w-8 h-8 flex items-center justify-center text-on-surface-variant text-label-sm select-none">…</span>
+                } @else {
+                  <button
+                    class="w-8 h-8 flex items-center justify-center rounded border font-bold text-label-sm transition-colors"
+                    [class]="p === page()
+                      ? 'border-primary bg-primary text-white'
+                      : 'border-outline-variant/30 bg-white hover:bg-surface-container-low text-on-surface-variant'"
+                    (click)="onPageChange(p)"
+                    [attr.aria-label]="'Page ' + (p + 1)"
+                    [attr.aria-current]="p === page() ? 'page' : null"
+                  >{{ p + 1 }}</button>
+                }
+              }
+
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/30 bg-white hover:bg-surface-container-low disabled:opacity-30 transition-colors"
+                [disabled]="page() >= totalPages() - 1"
+                (click)="onPageChange(page() + 1)"
+                aria-label="Next page"
+              >
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_right</span>
+              </button>
+            </nav>
+          </div>
+        }
+      }
+
+    </section>
+
+    <!-- ── Bottom Section ── -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+
+      <!-- Next Payout Cycle -->
+      <div class="bg-accent-teal/10 border border-accent-teal/30 rounded-2xl p-8 flex gap-6 items-center">
+        <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center shrink-0" aria-hidden="true">
+          <span class="material-symbols-outlined text-white text-[28px]">receipt_long</span>
+        </div>
+        <div>
+          <h4 class="font-headline-md text-primary text-lg">Next Payout Cycle</h4>
+          <p class="text-body-md text-on-surface-variant mt-1">
+            Current available balance:
+            <span class="font-bold text-primary">{{ wallet()?.currentBalance | appCurrency }}</span>
+            ready for withdrawal.
+          </p>
+          <p class="text-label-sm text-on-surface-variant/70 mt-1">
+            Last month earnings: {{ wallet()?.lastMonthEarnings | appCurrency }}
+          </p>
+          <button class="mt-3 text-primary font-bold text-label-sm flex items-center gap-1 hover:underline">
+            View Payout Details
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Insights -->
+      <div class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-8">
+        <h4 class="font-headline-md text-primary text-lg mb-5">Quick Insights</h4>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center text-body-md border-b border-outline-variant/20 pb-3">
+            <span class="text-on-surface-variant">Completion Rate</span>
+            <span class="font-bold text-green-600">{{ successRate() ?? '—' }}</span>
+          </div>
+          <div class="flex justify-between items-center text-body-md border-b border-outline-variant/20 pb-3">
+            <span class="text-on-surface-variant">Avg. Transaction Value</span>
+            <span class="font-bold text-primary">{{ avgTransaction() ?? '—' }}</span>
+          </div>
+          <div class="flex justify-between items-center text-body-md border-b border-outline-variant/20 pb-3">
+            <span class="text-on-surface-variant">Total Earned (All Time)</span>
+            <span class="font-bold text-primary">{{ wallet()?.totalEarned | appCurrency }}</span>
+          </div>
+          <div class="flex justify-between items-center text-body-md">
+            <span class="text-on-surface-variant">Active Appointments</span>
+            <span class="font-bold text-primary">{{ analytics()?.bookingStatus?.pending ?? '—' }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>

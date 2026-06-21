@@ -1,0 +1,414 @@
+<app-modal
+  [isOpen]="isOpen()"
+  size="xl"
+  labelledBy="user-detail-title"
+  (close)="isEditingMode() ? cancelEdit.emit() : close.emit()"
+>
+
+  <!-- ── [header]: Identity ribbon ─────────────────────────────────────────
+       Shell provides: bg-primary, px-6 py-6, flex justify-between items-center,
+       and the close X button. We project the user identity content only.
+  ──────────────────────────────────────────────────────────────────────────── -->
+  @if (user(); as u) {
+    <div class="flex items-center gap-4 flex-1 min-w-0 relative overflow-hidden" header>
+
+      <div
+        class="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center
+               text-white font-bold text-lg shrink-0"
+        aria-hidden="true"
+      >{{ u.fullName | initials }}</div>
+
+      <div class="min-w-0">
+        <h2 id="user-detail-title" class="font-bold text-white text-lg truncate">
+          {{ u.fullName ?? '—' }}
+        </h2>
+        <p class="text-white/70 text-sm truncate">{{ u.email ?? '—' }}</p>
+
+        <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+          <span
+            class="inline-block text-[10px] font-bold uppercase tracking-widest
+                   px-2.5 py-0.5 rounded-full"
+            [class]="isActive() ? 'bg-green-400/30 text-green-200' : 'bg-red-400/30 text-red-200'"
+          >{{ isActive() ? 'Active' : 'Blocked' }}</span>
+
+          @if (u.isEmailConfirmed) {
+            <span
+              class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest
+                     px-2 py-0.5 rounded-full bg-white/15 text-white/90"
+              title="Email verified"
+            >
+              <span class="material-symbols-outlined text-[11px]" aria-hidden="true">verified</span>
+              Verified
+            </span>
+          } @else {
+            <span
+              class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest
+                     px-2 py-0.5 rounded-full bg-amber-400/25 text-amber-200"
+              title="Email not confirmed"
+            >
+              <span class="material-symbols-outlined text-[11px]" aria-hidden="true">mail</span>
+              Unverified
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Decorative bg icon — clipped by overflow-hidden on the wrapper -->
+      <span
+        class="material-symbols-outlined absolute -right-4 -bottom-4 text-[80px]
+               opacity-10 select-none pointer-events-none text-white"
+        aria-hidden="true"
+      >person</span>
+
+    </div>
+  }
+
+  <!-- ── [body]: loading skeleton / read-only view / edit form ────────────
+       app-modal body has no built-in padding; each section adds its own px-6.
+  ──────────────────────────────────────────────────────────────────────────── -->
+  <div body>
+    @if (user(); as u) {
+
+      @if (isDetailLoading()) {
+
+        <!-- Loading skeleton -->
+        <div class="px-6 py-8 space-y-4 animate-pulse" aria-busy="true" aria-label="Loading details">
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div class="flex items-center gap-3">
+              <div class="w-5 h-5 rounded bg-surface-container-low shrink-0"></div>
+              <div class="flex-1 space-y-1.5">
+                <div class="h-2.5 bg-surface-container-low rounded w-1/4"></div>
+                <div class="h-3.5 bg-surface-container-low rounded w-1/2"></div>
+              </div>
+            </div>
+          }
+        </div>
+
+      } @else if (!isEditingMode()) {
+
+        <!-- ── READ-ONLY VIEW ──────────────────────────────────────────────── -->
+        <div class="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-outline-variant/20">
+
+          <!-- Left: core details -->
+          <dl class="flex-1 px-6 py-5 space-y-4 min-w-0">
+
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant w-5 shrink-0" aria-hidden="true">phone</span>
+              <div class="min-w-0">
+                <dt class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Phone</dt>
+                <dd class="text-primary font-semibold text-sm truncate">{{ u.phoneNumber ?? '—' }}</dd>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant w-5 shrink-0" aria-hidden="true">wc</span>
+              <div class="min-w-0 overflow-hidden">
+                <dt class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Gender</dt>
+                <dd class="text-primary font-semibold text-sm capitalize truncate">{{ u.gender ?? '—' }}</dd>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant w-5 shrink-0" aria-hidden="true">cake</span>
+              <div class="min-w-0">
+                <dt class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Date of Birth</dt>
+                <dd class="text-primary font-semibold text-sm truncate">{{ u.dateOfBirth | appDate }}</dd>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant w-5 shrink-0" aria-hidden="true">calendar_today</span>
+              <div class="min-w-0">
+                <dt class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Registered</dt>
+                <dd class="text-primary font-semibold text-sm truncate">{{ u.createdAt | appDate }}</dd>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant w-5 shrink-0" aria-hidden="true">payments</span>
+              <div class="min-w-0">
+                <dt class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Total Payments</dt>
+                <dd class="text-primary font-semibold text-sm">
+                  @if (u.totalPayments != null) {
+                    ${{ u.totalPayments.toFixed(2) }}
+                  } @else { — }
+                </dd>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant w-5 shrink-0" aria-hidden="true">fingerprint</span>
+              <div class="min-w-0">
+                <dt class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">User ID</dt>
+                <dd class="text-on-surface-variant font-mono text-[12px] break-all">{{ u.id }}</dd>
+              </div>
+            </div>
+
+          </dl>
+
+          <!-- Right: booking + payment history -->
+          <div class="flex-1 flex flex-col divide-y divide-outline-variant/20 min-w-0">
+
+            <!-- Booking History -->
+            <div class="px-6 py-5">
+              <h3 class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">calendar_month</span>
+                Booking History
+                @if (bookings().length > 0) {
+                  <span class="ml-auto text-[10px] font-bold bg-primary/8 text-primary px-2 py-0.5 rounded-full">
+                    {{ bookings().length }} {{ bookings().length === 1 ? 'visit' : 'visits' }}
+                  </span>
+                }
+              </h3>
+
+              @if (bookings().length === 0) {
+                <div class="flex flex-col items-center justify-center py-6 text-on-surface-variant">
+                  <span class="material-symbols-outlined text-[36px] opacity-25 mb-2" aria-hidden="true">event_busy</span>
+                  <p class="text-[12px] text-center">No bookings yet.</p>
+                </div>
+              } @else {
+                <div class="space-y-2.5">
+                  @for (b of bookings(); track b.id) {
+                    <div class="flex items-start justify-between gap-3 p-3 rounded-xl
+                                bg-surface-container-low/50 border border-outline-variant/20">
+                      <div class="min-w-0">
+                        <p class="text-[13px] font-semibold text-primary truncate">{{ b.specialty }}</p>
+                        <p class="text-[11px] text-on-surface-variant mt-0.5 truncate">{{ b.doctor }}</p>
+                        <div class="flex items-center gap-1 mt-1.5">
+                          <span class="material-symbols-outlined text-[11px] text-on-surface-variant" aria-hidden="true">schedule</span>
+                          <span class="text-[11px] text-on-surface-variant">{{ b.scheduledAt }}</span>
+                        </div>
+                      </div>
+                      <span
+                        class="shrink-0 text-[9px] font-bold px-2.5 py-1 rounded tracking-widest uppercase"
+                        [class]="b.status === 'completed'
+                          ? 'bg-green-100 text-green-700'
+                          : b.status === 'upcoming'
+                          ? 'bg-accent-teal/15 text-accent-teal'
+                          : 'bg-red-100 text-red-600'"
+                      >{{ b.status }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Payment History -->
+            <div class="px-6 py-5">
+              <h3 class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">credit_card</span>
+                Payment History
+              </h3>
+
+              @if (payments().length === 0) {
+                <div class="flex flex-col items-center justify-center py-6 text-on-surface-variant">
+                  <span class="material-symbols-outlined text-[36px] opacity-25 mb-2" aria-hidden="true">receipt_long</span>
+                  <p class="text-[12px] text-center">No payment history yet.</p>
+                </div>
+              } @else {
+                <table class="w-full" aria-label="Payment history">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="text-left text-[10px] font-bold text-on-surface-variant uppercase tracking-wider pb-2">Invoice</th>
+                      <th scope="col" class="text-center text-[10px] font-bold text-on-surface-variant uppercase tracking-wider pb-2">Method</th>
+                      <th scope="col" class="text-right text-[10px] font-bold text-on-surface-variant uppercase tracking-wider pb-2">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-outline-variant/20">
+                    @for (p of payments(); track p.invoiceId) {
+                      <tr>
+                        <td class="py-2.5 text-[12px] font-mono font-medium text-primary">{{ p.invoiceId }}</td>
+                        <td class="py-2.5">
+                          <div class="flex items-center justify-center gap-1.5">
+                            <span class="material-symbols-outlined text-[14px] text-on-surface-variant" aria-hidden="true">
+                              {{ p.method === 'visa' ? 'credit_card' : 'account_balance_wallet' }}
+                            </span>
+                            <span class="text-[12px] text-on-surface-variant capitalize">{{ p.method }}</span>
+                          </div>
+                        </td>
+                        <td class="py-2.5 text-right text-[12px] font-bold text-primary">${{ p.amount.toFixed(2) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              }
+            </div>
+
+          </div>
+        </div>
+
+      } @else {
+
+        <!-- ── EDIT FORM VIEW ──────────────────────────────────────────────── -->
+        @if (editForm(); as form) {
+          <form
+            id="user-edit-form"
+            [formGroup]="form"
+            (ngSubmit)="saveEdit.emit()"
+            class="px-6 py-5 space-y-4"
+            novalidate
+          >
+
+            <div>
+              <label for="edit-fullName" class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                Full Name <span class="text-error" aria-hidden="true">*</span>
+              </label>
+              <input
+                id="edit-fullName"
+                type="text"
+                formControlName="fullName"
+                autocomplete="name"
+                class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-primary
+                       placeholder:text-on-surface-variant/40 outline-none transition-all
+                       focus:ring-2 focus:ring-primary/30 focus:border-primary/60"
+                [class]="form.get('fullName')?.invalid && form.get('fullName')?.touched
+                  ? 'border-error bg-error/5'
+                  : 'border-outline-variant bg-surface-container-lowest'"
+                placeholder="Patient's full name"
+              />
+              @if (form.get('fullName')?.hasError('required') && form.get('fullName')?.touched) {
+                <p class="mt-1 text-[11px] text-error" role="alert">Full name is required.</p>
+              }
+            </div>
+
+            <div>
+              <label for="edit-email" class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                Email Address
+              </label>
+              <input
+                id="edit-email"
+                type="email"
+                formControlName="email"
+                autocomplete="email"
+                readonly
+                class="w-full px-3.5 py-2.5 rounded-xl border border-outline-variant/50
+                       bg-surface-container-low text-sm text-on-surface-variant/70
+                       outline-none cursor-not-allowed"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="edit-phone" class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                  Phone Number
+                </label>
+                <input
+                  id="edit-phone"
+                  type="tel"
+                  formControlName="phoneNumber"
+                  autocomplete="tel"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-outline-variant
+                         bg-surface-container-lowest text-sm text-primary
+                         placeholder:text-on-surface-variant/40 outline-none transition-all
+                         focus:ring-2 focus:ring-primary/30 focus:border-primary/60"
+                  placeholder="+1 (555) 000-0000"
+                />
+              </div>
+              <div>
+                <label for="edit-gender" class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                  Gender
+                </label>
+                <select
+                  id="edit-gender"
+                  formControlName="gender"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-outline-variant
+                         bg-surface-container-lowest text-sm text-primary outline-none transition-all
+                         focus:ring-2 focus:ring-primary/30 focus:border-primary/60"
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label for="edit-dob" class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                Date of Birth
+              </label>
+              <input
+                id="edit-dob"
+                type="date"
+                formControlName="dateOfBirth"
+                class="w-full px-3.5 py-2.5 rounded-xl border border-outline-variant
+                       bg-surface-container-lowest text-sm text-primary outline-none transition-all
+                       focus:ring-2 focus:ring-primary/30 focus:border-primary/60"
+              />
+            </div>
+
+          </form>
+        }
+
+      }
+
+    }
+  </div>
+
+  <!-- ── [footer]: conditional action buttons ──────────────────────────────
+       Read mode:  Edit Details  |  Close
+       Edit mode:  Cancel        |  Save Changes (bridges to #user-edit-form)
+  ──────────────────────────────────────────────────────────────────────────── -->
+  <div class="px-6 pb-5 flex flex-wrap gap-3" footer>
+
+    @if (!isEditingMode()) {
+      <button
+        type="button"
+        class="flex-1 py-2.5 rounded-xl bg-primary/8 border border-primary/20 font-semibold
+               text-sm text-primary hover:bg-primary/12 transition-colors
+               focus:outline-none focus:ring-2 focus:ring-primary/30
+               inline-flex items-center justify-center gap-1.5"
+        (click)="enterEdit.emit()"
+      >
+        <span class="material-symbols-outlined text-[16px] pointer-events-none" aria-hidden="true">edit</span>
+        Edit Details
+      </button>
+
+      <button
+        type="button"
+        class="flex-1 py-2.5 rounded-xl border border-outline-variant font-semibold
+               text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors
+               focus:outline-none focus:ring-2 focus:ring-outline"
+        (click)="close.emit()"
+      >Close</button>
+
+    } @else {
+
+      <button
+        type="button"
+        class="flex-1 py-2.5 rounded-xl border border-outline-variant font-semibold
+               text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors
+               focus:outline-none focus:ring-2 focus:ring-outline
+               disabled:opacity-50 disabled:cursor-not-allowed"
+        [disabled]="isSaving()"
+        (click)="cancelEdit.emit()"
+      >Cancel</button>
+
+      <button
+        type="submit"
+        form="user-edit-form"
+        class="flex-1 py-2.5 rounded-xl bg-primary text-on-primary font-semibold
+               text-sm hover:bg-primary/90 transition-colors
+               focus:outline-none focus:ring-2 focus:ring-primary/40
+               disabled:opacity-50 disabled:cursor-not-allowed
+               inline-flex items-center justify-center gap-2"
+        [disabled]="isSaving()"
+      >
+        @if (isSaving()) {
+          <span
+            class="material-symbols-outlined text-[16px] animate-spin pointer-events-none"
+            aria-hidden="true"
+          >progress_activity</span>
+          Saving…
+        } @else {
+          <span class="material-symbols-outlined text-[16px] pointer-events-none" aria-hidden="true">save</span>
+          Save Changes
+        }
+      </button>
+
+    }
+
+  </div>
+
+</app-modal>

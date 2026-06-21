@@ -1,0 +1,70 @@
+@if (isLoading()) {
+  <div class="space-y-4" aria-busy="true" aria-label="Loading pending approvals">
+    @for (i of [1, 2]; track i) {
+      <div class="animate-pulse rounded-xl bg-surface-container-low h-32"></div>
+    }
+  </div>
+} @else if (providers().length === 0) {
+  <div class="text-center py-10 text-on-surface-variant">
+    <span class="material-symbols-outlined text-[44px] opacity-20" aria-hidden="true">check_circle</span>
+    <p class="text-sm font-medium mt-2">No pending approvals</p>
+  </div>
+} @else {
+  <ul class="space-y-4" aria-label="Pending nurse applications">
+    @for (provider of providers(); track provider.id) {
+      <li class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/20 transition-all hover:shadow-sm">
+
+        <!-- Identity -->
+        <div class="flex items-start gap-3 mb-3">
+          <div
+            class="w-11 h-11 rounded-xl bg-primary/8 flex items-center justify-center font-bold text-primary text-sm shrink-0"
+            aria-hidden="true"
+          >{{ provider.fullName | initials }}</div>
+          <div class="min-w-0 flex-1">
+            <h4 class="font-bold text-[15px] text-primary truncate">{{ provider.fullName ?? '—' }}</h4>
+            <p class="text-[12px] text-on-surface-variant truncate">{{ provider.email }}</p>
+            <p class="text-[11px] text-on-surface-variant/70 mt-0.5">Applied {{ provider.createdAt | appDate }}</p>
+          </div>
+        </div>
+
+        <!-- View Certificates -->
+        <button
+          type="button"
+          class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-accent-teal hover:underline underline-offset-2 mb-3"
+          [attr.aria-label]="'View certificates for ' + provider.fullName"
+          (click)="viewDocuments.emit(provider)"
+        >
+          <span class="material-symbols-outlined text-[15px] pointer-events-none" aria-hidden="true">workspace_premium</span>
+          View Certificates
+        </button>
+
+        <!-- Approve / Reject -->
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            class="py-2.5 bg-primary text-white rounded-xl font-bold text-label-sm transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-1.5"
+            [disabled]="verifyingId() !== null"
+            (click)="approve.emit(provider)"
+            [attr.aria-label]="'Approve ' + provider.fullName"
+          >
+            @if (isVerifying(provider)) {
+              <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
+              Approving…
+            } @else {
+              <span class="material-symbols-outlined text-[16px] pointer-events-none" aria-hidden="true">check_circle</span>
+              Approve
+            }
+          </button>
+          <button
+            type="button"
+            class="py-2.5 border-2 border-error text-error rounded-xl font-bold text-label-sm transition-all hover:bg-error/5 disabled:opacity-50"
+            [disabled]="verifyingId() !== null"
+            (click)="reject.emit(provider)"
+            [attr.aria-label]="'Reject ' + provider.fullName"
+          >Reject</button>
+        </div>
+
+      </li>
+    }
+  </ul>
+}

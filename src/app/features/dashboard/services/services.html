@@ -1,0 +1,120 @@
+<main class="flex flex-col min-h-screen bg-surface">
+  <div class="flex-1 grid grid-cols-[450px_1fr] overflow-hidden h-[calc(100vh-64px)] gap-1">
+    
+    <!-- ── Left Column: Category Tree ───────────────────────── -->
+   <app-category-panel 
+  [categories]="categories()"
+  [expandedCategoryId]="expandedCategoryId()"
+  [selectedServiceId]="selectedServiceId()"
+  [servicesMap]="servicesMap()"
+  [loadingCategoryId]="loadingCategoryId()"
+  (categoryExpand)="onCategoryExpand($event)"
+  (serviceSelect)="onServiceSelected($event)"
+  (createCategory)="openCategoryModal()"
+  (editCategory)="openCategoryModal($event)"
+  (deleteCategory)="openDeleteCategoryModal($event)"
+  
+  (createService)="openServiceModal(null, $event)" class="h-full"
+/>
+    <!-- ── Right Column: Service Workspace ──────────────────── -->
+    <section class="flex flex-col bg-surface h-full border-l border-outline-variant/30">
+      @if (isLoadingDetails()) {
+        <!-- Skeleton Loading for Workspace -->
+        <div class="flex-1 flex items-center justify-center p-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-container"></div>
+        </div>
+      } @else if (selectedServiceDetails()) {
+        <!-- Workspace Panel -->
+        <app-service-workspace 
+          [service]="selectedServiceDetails()!"
+          [items]="serviceItems()"
+          [isLoadingItems]="isLoadingItems()"
+          (statusToggle)="onStatusToggle($event)"
+          (editCoreInfo)="onEditCoreInfo()"
+          (addItem)="openAddItemModal()"
+          (editItem)="openEditItemModal($event)"
+          (removeItem)="openRemoveItemModal($event)"
+          class="flex-1 overflow-hidden"
+        />
+      } @else {
+        <!-- Empty State (No Service Selected) -->
+        <div class="flex-1 flex flex-col items-center justify-center text-on-surface-variant/50">
+          <span class="material-symbols-outlined text-[64px] opacity-30 mb-4" aria-hidden="true">
+            medical_services
+          </span>
+          <p class="text-body-lg font-medium">Select a service from the directory to view details</p>
+        </div>
+      }
+    </section>
+
+  </div>
+</main>
+
+<!-- ── Modals ───────────────────────────────────────────── -->
+
+
+<app-service-modal
+  [isOpen]="showServiceModal()"
+  [service]="editServiceTarget()"
+  [isSubmitting]="isSubmittingService()"
+  (submitted)="onServiceSubmit($event)"
+  (closed)="closeServiceModal()"
+/>
+
+<app-confirmation-modal
+  [isOpen]="deleteServiceTarget() !== null"
+  title="Delete Service"
+  [message]="'Are you sure you want to delete service \'' + deleteServiceTarget()?.name + '\'? This will wipe its items configuration.'"
+  confirmLabel="Delete"
+  variant="danger"
+  icon="delete"
+  [isConfirming]="isDeletingService()"
+  (confirm)="confirmDeleteService()"
+  (cancel)="closeDeleteServiceModal()"
+/>
+
+
+<!-- Add/Edit Service Item Modal -->
+<app-add-item-modal
+  [isOpen]="showAddItemModal()"
+  [isSubmittingItem]="isSubmittingItem()"
+  [itemToResponseLookup]="itemToResponseLookup()"
+  [editItemTarget]="editItemTarget()"
+  (submitted)="onAddItemSubmit($event)"
+  (closed)="closeAddItemModal()"
+/>
+
+<!-- Remove Item Confirmation -->
+<app-confirmation-modal
+  [isOpen]="removeItemTarget() !== null"
+  title="Remove Procedure"
+  [message]="'Are you sure you want to remove \'' + removeItemTarget()?.name + '\' from this service? This action cannot be undone.'"
+  confirmLabel="Remove"
+  variant="danger"
+  icon="delete"
+  [isConfirming]="isRemovingItem()"
+  (confirm)="confirmRemoveItem()"
+  (cancel)="closeRemoveItemModal()"
+/>
+
+<!-- Category Form Modal -->
+<app-category-modal
+  [isOpen]="showCategoryModal()"
+  [category]="editCategoryTarget()"
+  [isSubmitting]="isSubmittingCategory()"
+  (submitted)="onCategorySubmit($event)"
+  (closed)="closeCategoryModal()"
+/>
+
+<!-- Category Delete Confirmation -->
+<app-confirmation-modal
+  [isOpen]="deleteCategoryTarget() !== null"
+  title="Delete Category"
+  [message]="'Are you sure you want to delete category \'' + deleteCategoryTarget()?.name + '\'? This action cannot be undone and may affect associated services.'"
+  confirmLabel="Delete"
+  variant="danger"
+  icon="delete"
+  [isConfirming]="isDeletingCategory()"
+  (confirm)="confirmDeleteCategory()"
+  (cancel)="closeDeleteCategoryModal()"
+/>

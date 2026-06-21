@@ -1,0 +1,115 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  class="space-y-4"
+  novalidate
+>
+
+  @if (createError()) {
+    <div role="alert" class="flex items-center gap-2 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
+      <span class="material-symbols-outlined text-[16px] pointer-events-none shrink-0" aria-hidden="true">error</span>
+      {{ createError() }}
+    </div>
+  }
+
+  <!-- Full Name -->
+  <app-form-field
+    label="Full Name"
+    fieldId="nurse-fullName"
+    [control]="form.controls['fullName']"
+    placeholder="e.g. Sarah Johnson"
+    autocomplete="name"
+    [required]="true"
+    errorMessage="Full name is required."
+  />
+
+  <!-- Username -->
+  <app-form-field
+    label="Username"
+    fieldId="nurse-userName"
+    [control]="form.controls['userName']"
+    placeholder="e.g. sarah.johnson"
+    autocomplete="username"
+    [required]="true"
+    errorMessage="Username is required."
+  />
+
+  <!-- Email + Phone -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <app-form-field
+      label="Email"
+      fieldId="nurse-email"
+      [control]="form.controls['emailAddress']"
+      type="email"
+      placeholder="email@example.com"
+      autocomplete="email"
+      [required]="true"
+      errorMessage="A valid email is required."
+    />
+    <app-form-field
+      label="Phone"
+      fieldId="nurse-phone"
+      [control]="form.controls['phoneNumber']"
+      type="tel"
+      placeholder="+1 555 0100"
+      autocomplete="tel"
+      [required]="true"
+      errorMessage="Phone number is required."
+    />
+  </div>
+
+  <!-- Password -->
+  <app-form-field
+    label="Password"
+    fieldId="nurse-password"
+    [control]="form.controls['password']"
+    type="password"
+    placeholder="Min. 6 characters"
+    autocomplete="new-password"
+    [required]="true"
+    errorMessage="Password must be at least 6 characters."
+  />
+
+  <!-- DOB + Gender -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <app-form-field
+      label="Date of Birth"
+      fieldId="nurse-dob"
+      [control]="form.controls['dateOfBirth']"
+      type="date"
+    />
+    <app-form-field
+      label="Gender"
+      fieldId="nurse-gender"
+      [control]="form.controls['gender']"
+      type="select"
+    >
+      <option [value]="Gender.Female">Female</option>
+      <option [value]="Gender.Male">Male</option>
+    </app-form-field>
+  </div>
+
+  <!-- Footer Actions -->
+  <div class="flex justify-end gap-3 pt-2">
+    <button
+      type="button"
+      class="px-5 py-2.5 rounded-xl border border-outline-variant font-semibold text-body-md text-on-surface-variant hover:bg-surface-container-low transition-colors disabled:opacity-50"
+      [disabled]="isSubmitting()"
+      (click)="close()"
+    >Cancel</button>
+    <button
+      type="submit"
+      class="px-6 py-2.5 rounded-xl bg-primary text-white font-bold text-body-md hover:opacity-90 transition-all disabled:opacity-50 flex items-center gap-2"
+      [disabled]="isSubmitting()"
+    >
+      @if (isSubmitting()) {
+        <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
+        Creating…
+      } @else {
+        <span class="material-symbols-outlined text-[18px] pointer-events-none" aria-hidden="true">person_add</span>
+        Create Nurse
+      }
+    </button>
+  </div>
+
+</form>

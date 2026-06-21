@@ -1,0 +1,93 @@
+<section
+  class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-6 flex flex-col h-full"
+  aria-label="Revenue analytics chart"
+>
+  <!-- Header -->
+  <div class="flex items-start justify-between gap-4 mb-6">
+    <div class="min-w-0">
+      <h3 class="font-headline-md text-headline-md text-primary">Revenue Analytics</h3>
+      <!-- Dynamic insight subtitle — updates based on the actual data -->
+      <p class="text-[11px] text-on-surface-variant mt-1 leading-snug max-w-xs">
+        {{ subtitle() }}
+      </p>
+    </div>
+
+    <!-- Period picker -->
+    <div class="relative shrink-0">
+      <button
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant/30 bg-white text-[12px] font-semibold text-on-surface-variant hover:bg-surface-container-low transition-colors"
+        (click)="showPeriodMenu.set(!showPeriodMenu())"
+        [attr.aria-expanded]="showPeriodMenu()"
+        aria-haspopup="listbox"
+        aria-label="Select time period"
+      >
+        {{ selectedLabel() }}
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">expand_more</span>
+      </button>
+
+      @if (showPeriodMenu()) {
+        <ul
+          class="absolute right-0 top-full mt-1.5 bg-white rounded-xl border border-outline-variant/20 shadow-xl overflow-hidden z-20 min-w-40"
+          role="listbox"
+          aria-label="Time period options"
+        >
+          @for (option of periods; track option.value) {
+            <li>
+              <button
+                type="button"
+                role="option"
+                class="w-full text-left px-4 py-2.5 text-[13px] hover:bg-surface-container-low transition-colors flex items-center gap-2"
+                [class]="activePeriod() === option.value
+                  ? 'font-bold text-primary bg-primary/4'
+                  : 'text-on-surface-variant'"
+                [attr.aria-selected]="activePeriod() === option.value"
+                (click)="selectPeriod(option.value)"
+              >
+                @if (activePeriod() === option.value) {
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0" aria-hidden="true"></span>
+                } @else {
+                  <span class="w-1.5 h-1.5 shrink-0" aria-hidden="true"></span>
+                }
+                {{ option.label }}
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+
+  <!-- Chart or empty state -->
+  @if (data().length === 0) {
+    <div class="flex-1 flex flex-col items-center justify-center py-12 text-on-surface-variant gap-2">
+      <span class="material-symbols-outlined text-[44px] opacity-20" aria-hidden="true">bar_chart</span>
+      <p class="text-sm font-medium">No revenue data for this period</p>
+      <p class="text-xs opacity-70">Try selecting a different time range above.</p>
+    </div>
+  } @else {
+    <!-- Color key strip — adapts label to period grain -->
+    <div class="flex items-center gap-5 mb-4" aria-label="Chart legend">
+      @if (peakIndex() >= 0) {
+        <div class="flex items-center gap-1.5">
+          <span class="w-3 h-3 rounded-sm bg-[#08204d] shrink-0" aria-hidden="true"></span>
+          <span class="text-[11px] text-on-surface-variant font-medium">Peak period</span>
+        </div>
+      }
+      <div class="flex items-center gap-1.5">
+        <span class="w-3 h-3 rounded-sm bg-slate-300 shrink-0" aria-hidden="true"></span>
+        <span class="text-[11px] text-on-surface-variant font-medium">
+          {{ peakIndex() >= 0 ? 'Other periods' : 'All periods (uniform)' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="flex-1 min-h-52" aria-label="Revenue bar chart — hover bars for exact values">
+      <canvas
+        #chartCanvas
+        role="img"
+        [attr.aria-label]="'Revenue bar chart: ' + subtitle()"
+      ></canvas>
+    </div>
+  }
+</section>

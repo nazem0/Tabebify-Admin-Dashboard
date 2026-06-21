@@ -1,0 +1,295 @@
+<div
+  class="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-sm overflow-hidden"
+>
+  <p-table
+    [value]="data()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="pageSize()"
+    [totalRecords]="totalRecords()"
+    [loading]="isLoading()"
+    [first]="first()"
+    [tableStyle]="tableStyle()"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    styleClass="p-datatable-striped"
+    (onLazyLoad)="handleLazyLoad($event)"
+  >
+    <!-- ── Caption: search + export ──────────────────────────────────────── -->
+    <ng-template #caption>
+      <div
+        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-5 py-3 bg-surface-container-lowest border-b border-outline-variant/50"
+      >
+        <div class="relative w-full sm:w-72">
+          <span
+            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant/60 pointer-events-none"
+            aria-hidden="true"
+            >search</span
+          >
+          <input
+            type="search"
+            class="w-full pl-9 pr-4 py-2 text-sm bg-surface-container-low border border-outline-variant rounded-xl placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
+            placeholder="Search…"
+            [value]="search()"
+            (input)="onSearchInput($any($event.target).value)"
+            aria-label="Search records"
+          />
+        </div>
+
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-primary border border-outline-variant rounded-xl hover:bg-surface-container-low transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 shrink-0"
+          (click)="downloadCSV()"
+        >
+          <span class="material-symbols-outlined text-[16px]" aria-hidden="true">download</span>
+          Export CSV
+        </button>
+      </div>
+    </ng-template>
+
+    <!-- ── Header row ─────────────────────────────────────────────────────── -->
+    <ng-template #header>
+      <tr>
+        @for (col of columns(); track col.field) {
+          <th
+            scope="col"
+            [class]="
+              tdClass(
+                col,
+                'px-6 py-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider bg-surface-container-low/60 text-left'
+              )
+            "
+          >
+            {{ col.header }}
+          </th>
+        }
+      </tr>
+    </ng-template>
+
+    <!-- ── Body rows ──────────────────────────────────────────────────────── -->
+    <ng-template #body let-rowData>
+      <tr
+        class="border-b border-outline-variant/40 hover:bg-surface-container-low/40 transition-colors duration-150 cursor-pointer"
+        (click)="onRowClick.emit(rowData)"
+      >
+        @for (col of columns(); track col.field) {
+          @switch (col.type) {
+            @case ('avatar') {
+              <td [class]="tdClass(col)">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 rounded-full bg-primary/10 border border-outline-variant flex items-center justify-center text-sm font-bold text-primary shrink-0"
+                    aria-hidden="true"
+                  >
+                    {{ getValue(rowData, col) | initials }}
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-on-surface truncate">
+                      {{ getValue(rowData, col) ?? '—' }}
+                    </p>
+                    @if (col.subtitleField) {
+                      <p class="text-xs text-on-surface-variant truncate">
+                        {{ rowData[col.subtitleField] ?? '—' }}
+                      </p>
+                    }
+                  </div>
+                </div>
+              </td>
+            }
+
+            @case ('badge') {
+              <td [class]="tdClass(col)" (click)="$event.stopPropagation()">
+                <app-status-badge
+                  [status]="getValue(rowData, col) ?? ''"
+                  [scheme]="col.scheme ?? 'user'"
+                />
+              </td>
+            }
+
+            @case ('date') {
+              <td
+                [class]="
+                  tdClass(col, 'px-6 py-4 text-sm text-on-surface-variant whitespace-nowrap')
+                "
+              >
+                {{ getValue(rowData, col) | appDate }}
+              </td>
+            }
+
+            @case ('rating') {
+              <td [class]="tdClass(col)">
+                <div class="flex items-center gap-1.5">
+                  <span
+                    class="material-symbols-outlined text-amber-400 text-[16px]"
+                    aria-hidden="true"
+                    >star</span
+                  >
+                  <span class="text-sm font-semibold text-on-surface">
+                    {{ getValue(rowData, col) != null ? getValue(rowData, col).toFixed(1) : '—' }}
+                  </span>
+                  @if (col.ratingCountField) {
+                    <span class="text-xs text-on-surface-variant">
+                      ({{ rowData[col.ratingCountField] ?? 0 }})
+                    </span>
+                  }
+                </div>
+              </td>
+            }
+
+            @case ('currency') {
+              <td [class]="tdClass(col)">
+                @if (getValue(rowData, col) != null) {
+                  <span class="text-sm font-semibold text-on-surface">
+                    {{ col.prefix ?? '' }}{{ getValue(rowData, col).toFixed(2) }}
+                  </span>
+                } @else {
+                  <span class="text-sm text-on-surface-variant/40 select-none" aria-hidden="true"
+                    >—</span
+                  >
+                }
+              </td>
+            }
+
+            @case ('booking') {
+              <td [class]="tdClass(col)" (click)="$event.stopPropagation()">
+                @if (getValue(rowData, col) != null) {
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-teal hover:underline focus:outline-none focus:ring-2 focus:ring-accent-teal/30 rounded"
+                    (click)="onView.emit(rowData)"
+                  >
+                    <span class="material-symbols-outlined text-[15px]" aria-hidden="true"
+                      >schedule</span
+                    >
+                    {{
+                      getValue(rowData, col) === 1
+                        ? '1 Booking'
+                        : getValue(rowData, col) + ' Bookings'
+                    }}
+                  </button>
+                } @else {
+                  <span class="text-sm text-on-surface-variant/40 select-none" aria-hidden="true"
+                    >—</span
+                  >
+                }
+              </td>
+            }
+
+            @case ('actions') {
+              <td [class]="tdClass(col)" (click)="$event.stopPropagation()">
+                <div class="flex items-center justify-end gap-1.5">
+                  @if (col.actions?.showResetPassword) {
+                    <button
+                      type="button"
+                      class="w-9 h-9 inline-flex items-center justify-center rounded-full bg-amber-50 text-amber-500 hover:bg-amber-100 transition-colors duration-200"
+                      title="Reset password"
+                      (click)="$event.stopPropagation(); onResetPassword.emit(rowData)"
+                    >
+                      <span class="material-symbols-outlined text-[17px]">lock_reset</span>
+                    </button>
+                  }
+                  @if (col.actions?.showView) {
+                    <button
+                      type="button"
+                      class="w-9 h-9 inline-flex items-center justify-center rounded-lg text-on-surface-variant hover:text-accent-teal hover:bg-accent-teal/10 transition-colors"
+                      title="View details"
+                      (click)="onView.emit(rowData)"
+                    >
+                      <span class="material-symbols-outlined text-[17px]" aria-hidden="true"
+                        >visibility</span
+                      >
+                    </button>
+                  }
+
+                  @if (col.actions?.showBlock) {
+                    <button
+                      type="button"
+                      class="w-9 h-9 inline-flex items-center justify-center rounded-full border transition-colors duration-200 disabled:opacity-50"
+                      [class]="
+                        isRowActive(rowData)
+                          ? 'border-red-200 text-red-500 hover:bg-red-50'
+                          : 'border-green-200 text-green-600 hover:bg-green-50'
+                      "
+                      [disabled]="isRowToggling(rowData)"
+                      [attr.title]="isRowActive(rowData) ? 'Block account' : 'Unblock account'"
+                      (click)="onToggleBlock.emit(rowData)"
+                    >
+                      @if (isRowToggling(rowData)) {
+                        <svg
+                          class="animate-spin w-4 h-4"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          aria-label="Updating status"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          />
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        </svg>
+                      } @else {
+                        <span class="material-symbols-outlined text-[17px]" aria-hidden="true">
+                          {{ isRowActive(rowData) ? 'block' : 'check_circle' }}
+                        </span>
+                      }
+                    </button>
+                  }
+
+                  @if (col.actions?.showEdit) {
+                    <button
+                      type="button"
+                      class="w-9 h-9 inline-flex items-center justify-center rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors"
+                      title="Edit"
+                      (click)="onEdit.emit(rowData)"
+                    >
+                      <span class="material-symbols-outlined text-[17px]" aria-hidden="true"
+                        >edit</span
+                      >
+                    </button>
+                  }
+
+                  @if (col.actions?.showDelete) {
+                    <button
+                      type="button"
+                      class="w-9 h-9 inline-flex items-center justify-center rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors"
+                      title="Delete"
+                      (click)="onDelete.emit(rowData)"
+                    >
+                      <span class="material-symbols-outlined text-[17px]" aria-hidden="true"
+                        >delete</span
+                      >
+                    </button>
+                  }
+                </div>
+              </td>
+            }
+
+            @default {
+              <td [class]="tdClass(col, 'px-6 py-4 text-sm text-on-surface-variant')">
+                {{ getValue(rowData, col) ?? '—' }}
+              </td>
+            }
+          }
+        }
+      </tr>
+    </ng-template>
+
+    <!-- ── Empty state ────────────────────────────────────────────────────── -->
+    <ng-template #emptymessage>
+      <tr>
+        <td [attr.colspan]="columns().length" class="text-center py-16">
+          <span
+            class="material-symbols-outlined text-[48px] block mb-3 text-on-surface-variant/30"
+            aria-hidden="true"
+            >{{ emptyIcon() }}</span
+          >
+          <p class="text-sm text-on-surface-variant/60 font-medium">{{ emptyMessage() }}</p>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -1,0 +1,101 @@
+<section
+  class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-6 flex flex-col h-full"
+  aria-label="Booking status breakdown"
+>
+  <!-- Header -->
+  <div class="mb-5">
+    <h3 class="font-headline-md text-headline-md text-primary">Booking Status</h3>
+    <p class="text-[11px] text-on-surface-variant mt-0.5">
+      Distribution across all recorded bookings.
+    </p>
+  </div>
+
+  @if (!status()) {
+
+    <div class="flex-1 flex flex-col items-center justify-center py-10 text-on-surface-variant gap-2">
+      <span class="material-symbols-outlined text-[40px] opacity-20" aria-hidden="true">donut_large</span>
+      <p class="text-sm font-medium">No status data available</p>
+    </div>
+
+  } @else {
+
+    <!--
+      Donut container: h-44 gives ~176 px. cutout = 76% → inner diameter ≈ 134 px.
+      The center overlay is constrained to ~110 px wide so it never clips the ring.
+    -->
+    <div class="relative flex justify-center items-center h-44 mb-2 shrink-0">
+      <canvas
+        #statusCanvas
+        role="img"
+        class="absolute inset-0"
+        [attr.aria-label]="allZero()
+          ? 'Booking status donut: no activity recorded yet'
+          : 'Booking status donut: ' + successRate() + '% success rate, ' + totalBookings() + ' total bookings'"
+      ></canvas>
+
+      <!--
+        Center KPI overlay.
+        max-w-27.5 keeps the text well inside the 76% cutout hole at all viewport sizes.
+        All-zero state shows a distinct "No data" message so the grey ring is never misread.
+      -->
+      <div
+        class="relative z-10 flex flex-col items-center pointer-events-none text-center max-w-27.5"
+        aria-hidden="true"
+      >
+        @if (allZero()) {
+          <span class="material-symbols-outlined text-[24px] text-on-surface-variant opacity-30 mb-1">
+            hourglass_empty
+          </span>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant opacity-40 leading-tight">
+            No&nbsp;activity
+          </span>
+        } @else {
+          <span class="text-[28px] font-black text-primary leading-none tabular-nums">
+            {{ successRate() }}%
+          </span>
+          <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant mt-1 leading-tight">
+            Success&nbsp;Rate
+          </span>
+          <span class="text-[10px] text-on-surface-variant/60 mt-1 tabular-nums leading-tight">
+            {{ totalBookings().toLocaleString() }}&nbsp;total
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Legend — each row is a self-contained reading unit: color + label + count -->
+    <ul class="mt-4 space-y-2" role="list" aria-label="Booking status legend">
+      @for (item of legend(); track item.label) {
+        <li
+          class="flex items-center gap-3 px-3 py-2.5 rounded-xl"
+          [class]="item.bgColor"
+        >
+          <!-- Semantic color swatch -->
+          <span
+            class="w-2.5 h-2.5 rounded-full shrink-0"
+            [style.background-color]="item.color"
+            [attr.aria-hidden]="true"
+          ></span>
+
+          <!-- Label + context -->
+          <div class="flex-1 min-w-0">
+            <p class="text-[12px] font-bold leading-none" [class]="item.textColor">
+              {{ item.label }}
+            </p>
+            <p class="text-[10px] text-on-surface-variant mt-0.5 leading-none">
+              {{ item.description }}
+            </p>
+          </div>
+
+          <!-- Hard count — the number the client actually reads -->
+          <span
+            class="text-[14px] font-black tabular-nums shrink-0"
+            [class]="item.textColor"
+            [attr.aria-label]="item.value.toLocaleString() + ' ' + item.label.toLowerCase() + ' bookings'"
+          >{{ item.value.toLocaleString() }}</span>
+        </li>
+      }
+    </ul>
+
+  }
+</section>
