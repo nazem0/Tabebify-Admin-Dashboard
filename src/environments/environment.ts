@@ -1,16 +1,16 @@
 import { Environment } from '@abp/ng.core';
 
-const baseUrl = 'http://localhost:4200';
+const baseUrl = 'https://tabebify-admin-dashboard.vercel.app';
 
 export const environment = {
-  production: false,
+  production: true,
   application: {
     baseUrl,
     name: 'Tabebify',
     logoUrl: '',
   },
   oAuthConfig: {
-  issuer: 'https://localhost:44318/', // تأكد من الـ Port والـ HTTPS
+  issuer: 'https://tabebify.tryasp.net/', // تأكد من الـ Port والـ HTTPS
   redirectUri: baseUrl  , 
   clientId: 'Tabebify_App',
   responseType: 'password', 
@@ -19,7 +19,7 @@ export const environment = {
 },
   apis: {
     default: {
-      url: 'https://localhost:44318',
+      url: 'https://tabebify.tryasp.net',
       rootNamespace: 'Tabebify',
     },
   },
