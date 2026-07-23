@@ -3,6 +3,7 @@ import { ModalComponent } from '../../../../../shared/components/modal/modal';
 import { AppInitialsPipe } from '../../../../../shared/pipes/initials.pipe';
 import { AppDatePipe } from '../../../../../shared/pipes/app-date.pipe';
 import type { AdminProviderListDto } from '../../../../../proxy/admin';
+import { ProviderAccountStatus } from '../../../../../proxy/profiles';
 
 @Component({
   selector: 'app-nurse-profile-modal',
@@ -56,7 +57,7 @@ import type { AdminProviderListDto } from '../../../../../proxy/admin';
             <span class="material-symbols-outlined text-[18px] text-on-surface-variant w-5 shrink-0" aria-hidden="true">badge</span>
             <div>
               <dt class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Status</dt>
-              <dd class="font-semibold text-body-md capitalize" [class]="statusClass(p)">
+              <dd class="font-semibold text-body-md" [class]="statusClass(p)">
                 {{ statusLabel(p) }}
               </dd>
             </div>
@@ -100,17 +101,30 @@ export class NurseProfileModalComponent {
   readonly viewDocuments = output<AdminProviderListDto>();
 
   protected statusLabel(p: AdminProviderListDto): string {
-    if (p.isAvailable) return 'Available';
-    return p.accountStatus ?? 'Unknown';
+    switch (p.accountStatus) {
+      case ProviderAccountStatus.PendingDocuments: return 'Pending Documents';
+      case ProviderAccountStatus.PendingReview:    return 'Pending Review';
+      case ProviderAccountStatus.Approved:         return 'Approved';
+      case ProviderAccountStatus.Rejected:         return 'Rejected';
+      case ProviderAccountStatus.Suspended:        return 'Suspended';
+      case ProviderAccountStatus.UnverifiedPhone:  return 'Unverified Phone';
+      default:                                     return 'Unknown';
+    }
   }
 
   protected statusClass(p: AdminProviderListDto): string {
-    if (p.isAvailable) return 'text-secondary';
-    switch (p.accountStatus?.toLowerCase()) {
-      case 'active':   return 'text-secondary';
-      case 'pending':  return 'text-amber-600';
-      case 'rejected': return 'text-error';
-      default:         return 'text-on-surface-variant';
+    switch (p.accountStatus) {
+      case ProviderAccountStatus.Approved:
+        return 'text-secondary';
+      case ProviderAccountStatus.PendingDocuments:
+      case ProviderAccountStatus.PendingReview:
+      case ProviderAccountStatus.UnverifiedPhone:
+        return 'text-amber-600';
+      case ProviderAccountStatus.Rejected:
+      case ProviderAccountStatus.Suspended:
+        return 'text-error';
+      default:
+        return 'text-on-surface-variant';
     }
   }
 }

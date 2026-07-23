@@ -68,8 +68,8 @@
         </td>
 
         <!-- Is Active (nurse's own online/offline availability — not the admin block state) -->
-        <td class="px-5 py-4">
-          <app-status-badge [status]="nurse.isAvailable ? 'active' : 'inactive'" scheme="provider" />
+        <td class="px-5 py-4 text-center">
+          <app-status-badge [status]="nurse.isAvailable ? 'online' : 'offline'" scheme="provider" />
         </td>
 
         <!-- Joined -->

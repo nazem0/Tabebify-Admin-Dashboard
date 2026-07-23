@@ -82,10 +82,32 @@
       label="Gender"
       fieldId="nurse-gender"
       [control]="form.controls['gender']"
-      type="select"
+      type="custom"
     >
-      <option [value]="Gender.Female">Female</option>
-      <option [value]="Gender.Male">Male</option>
+      <div
+        class="flex items-center gap-5 px-4 py-2.5 bg-surface-container-low border border-outline-variant rounded-xl"
+        role="radiogroup"
+        aria-label="Gender"
+      >
+        <label class="flex items-center gap-2 cursor-pointer text-body-md text-on-surface">
+          <input
+            type="radio"
+            class="w-4 h-4 accent-primary cursor-pointer"
+            formControlName="gender"
+            [value]="Gender.Female"
+          />
+          Female
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer text-body-md text-on-surface">
+          <input
+            type="radio"
+            class="w-4 h-4 accent-primary cursor-pointer"
+            formControlName="gender"
+            [value]="Gender.Male"
+          />
+          Male
+        </label>
+      </div>
     </app-form-field>
   </div>
 

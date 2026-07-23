@@ -30,8 +30,8 @@ export class NurseTableComponent {
     return this.togglingUserId() === nurse.id;
   }
 
-  protected getStatus(nurse: AdminProviderListDto): string {
-    return this.isActive(nurse) ? 'active' : 'blocked';
+  protected getStatus(nurse: AdminProviderListDto): number | string {
+    return nurse.accountStatus ?? '';
   }
 
   protected getMenuItems(nurse: AdminProviderListDto): RowActionItem[] {

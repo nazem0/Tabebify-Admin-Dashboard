@@ -7,6 +7,8 @@ interface BadgeStyle {
   label: string;
   dot: string;
   pulse: boolean;
+  /** Render a filled circle icon only — no pill or text. */
+  iconOnly?: boolean;
 }
 
 const FALLBACK: BadgeStyle = {
@@ -28,15 +30,27 @@ const APPOINTMENT_STYLES: Record<number, BadgeStyle> = {
   8: { classes: 'bg-red-100 text-red-800',       label: 'Cancelled',        dot: 'bg-red-500',     pulse: false },
 };
 
+/** Maps ProviderAccountStatus enum values (0–5). */
+const PROVIDER_ACCOUNT_STYLES: Record<number, BadgeStyle> = {
+  0: { classes: 'bg-amber-100 text-amber-800', label: 'Pending Documents', dot: 'bg-amber-500', pulse: false },
+  1: { classes: 'bg-amber-100 text-amber-800', label: 'Pending Review',    dot: 'bg-amber-500', pulse: true },
+  2: { classes: 'bg-green-100 text-green-800', label: 'Approved',          dot: 'bg-green-500', pulse: false },
+  3: { classes: 'bg-red-100 text-red-800',     label: 'Rejected',          dot: 'bg-red-500',   pulse: false },
+  4: { classes: 'bg-red-100 text-red-800',     label: 'Suspended',         dot: 'bg-red-500',   pulse: false },
+  5: { classes: 'bg-amber-100 text-amber-800', label: 'Unverified Phone',  dot: 'bg-amber-500', pulse: false },
+};
+
 function resolveUserOrProvider(raw: string): BadgeStyle {
   switch (raw) {
+    case 'online':
+      return { classes: 'text-green-500', label: 'Available', dot: '', pulse: false, iconOnly: true };
+    case 'offline':
+      return { classes: 'text-on-surface-variant/25', label: 'Unavailable', dot: '', pulse: false, iconOnly: true };
     case 'active':
     case 'true':
-    case '1':
       return { classes: 'bg-green-100 text-green-800',   label: 'Active',   dot: 'bg-green-500',   pulse: false };
     case 'inactive':
     case 'false':
-    case '0':
       return { classes: 'bg-surface-container-low text-on-surface-variant', label: 'Inactive', dot: 'bg-outline-variant', pulse: false };
     case 'blocked':
       return { classes: 'bg-red-100 text-red-800',     label: 'Blocked',  dot: 'bg-red-500',     pulse: false };
@@ -64,17 +78,27 @@ function resolveDocument(raw: string): BadgeStyle {
   selector: 'app-status-badge',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <span
-      class="px-3 py-1 rounded-full text-label-sm font-bold inline-flex items-center gap-1.5 w-fit"
-      [class]="style().classes"
-    >
+    @if (style().iconOnly) {
       <span
-        class="w-1.5 h-1.5 rounded-full shrink-0"
-        [class]="style().dot + (style().pulse ? ' animate-pulse' : '')"
-        aria-hidden="true"
-      ></span>
-      {{ label() || style().label }}
-    </span>
+        class="material-symbols-outlined text-[18px] inline-flex"
+        style="font-variation-settings: 'FILL' 1"
+        [class]="style().classes"
+        [attr.aria-label]="label() || style().label"
+        [attr.title]="label() || style().label"
+      >circle</span>
+    } @else {
+      <span
+        class="px-3 py-1 rounded-full text-label-sm font-bold inline-flex items-center gap-1.5 w-fit"
+        [class]="style().classes"
+      >
+        <span
+          class="w-1.5 h-1.5 rounded-full shrink-0"
+          [class]="style().dot + (style().pulse ? ' animate-pulse' : '')"
+          aria-hidden="true"
+        ></span>
+        {{ label() || style().label }}
+      </span>
+    }
   `,
 })
 export class StatusBadgeComponent {
@@ -92,9 +116,23 @@ export class StatusBadgeComponent {
       return APPOINTMENT_STYLES[num] ?? FALLBACK;
     }
 
+    if (scheme === 'provider') {
+      // Prefer ProviderAccountStatus numeric values; fall back to string statuses.
+      const num =
+        typeof s === 'number'
+          ? s
+          : typeof s === 'string' && /^\d+$/.test(s)
+            ? Number(s)
+            : NaN;
+      if (Number.isInteger(num) && PROVIDER_ACCOUNT_STYLES[num]) {
+        return PROVIDER_ACCOUNT_STYLES[num];
+      }
+      return resolveUserOrProvider(String(s).toLowerCase());
+    }
+
     const raw = String(s).toLowerCase();
 
-    if (scheme === 'user' || scheme === 'provider') {
+    if (scheme === 'user') {
       return resolveUserOrProvider(raw);
     }
 

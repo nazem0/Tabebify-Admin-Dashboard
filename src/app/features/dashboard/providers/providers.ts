@@ -25,6 +25,7 @@ import { NurseProfileModalComponent } from './components/nurse-profile-modal/nur
 import { GenericTableComponent } from "../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../shared/components/generic-table/table-column.model';
 import { TableLazyLoadEvent } from 'primeng/table';
+import { ProviderAccountStatus } from '../../../proxy/profiles';
 
 @Component({
   selector: 'app-providers',
@@ -46,26 +47,25 @@ protected readonly cols: TableColumn[] = [
     field: 'fullName',
     header: 'Nurse',
     type: 'avatar',
-    subtitleField: 'email', 
+    subtitleField: 'email',
   },
   {
     field: 'ratingAverage',
     header: 'Rating',
-    type: 'rating', 
+    type: 'rating',
   },
   {
-    field: 'accountStatus', 
+    field: 'accountStatus',
     header: 'Account Status',
     type: 'badge',
     scheme: 'provider',
-    valueResolver: (row: AdminProviderListDto) => (row.isAccountActive ? 'active' : 'blocked'), 
   },
   {
-    field: 'isAvailable', 
-    header: 'Is Active',
+    field: 'isAvailable',
+    header: 'Available',
     type: 'badge',
     scheme: 'provider',
-    valueResolver: (row: AdminProviderListDto) => row.isAvailable ? 'active' : 'inactive',
+    valueResolver: (row: AdminProviderListDto) => (row.isAvailable ? 'online' : 'offline'),
   },
   {
     field: 'createdAt',
@@ -77,7 +77,7 @@ protected readonly cols: TableColumn[] = [
     field: '_actions',
     header: 'Actions',
     type: 'actions',
-    skipExport: true, 
+    skipExport: true,
     actions: {showBlock : true, showEdit: true, showDelete: true, showResetPassword: true, showView: true}
   }
 ];
@@ -136,7 +136,6 @@ protected readonly cols: TableColumn[] = [
     this.error.set(null);
     this.adminService
       .getProviders({
-        status: 'Active',
         filter: this.search() || undefined,
         skipCount: this.page() * this.pageSize,
         maxResultCount: this.pageSize,
@@ -158,7 +157,7 @@ protected readonly cols: TableColumn[] = [
   protected loadPendingNurses(): void {
     this.isLoadingPending.set(true);
     this.adminService
-      .getProviders({ status: 'PendingReview', maxResultCount: 10 })
+      .getProviders({ accountStatus: ProviderAccountStatus.PendingReview, skipCount: 0,   maxResultCount: 10 })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: result => {
@@ -330,5 +329,5 @@ protected readonly cols: TableColumn[] = [
       });
   }
 
-  
+
 }
