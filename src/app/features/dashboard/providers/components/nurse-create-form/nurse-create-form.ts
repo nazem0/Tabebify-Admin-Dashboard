@@ -71,7 +71,7 @@ export class NurseCreateFormComponent {
         phoneNumber: v.phoneNumber,
         dateOfBirth: v.dateOfBirth || undefined,
         gender: v.gender,
-        role: 'Nurse',
+        role: 'Provider',
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
