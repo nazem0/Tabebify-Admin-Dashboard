@@ -999,10 +999,10 @@
               "parameters": [
                 {
                   "nameOnMethod": "input",
-                  "name": "Status",
+                  "name": "AccountStatus",
                   "jsonName": null,
-                  "type": "System.String",
-                  "typeSimple": "string",
+                  "type": "Tabebify.Profiles.ProviderAccountStatus?",
+                  "typeSimple": "enum?",
                   "isOptional": false,
                   "defaultValue": null,
                   "constraintTypes": null,
@@ -2716,6 +2716,227 @@
             }
           }
         },
+        "Tabebify.Controllers.AccountExtendedController": {
+          "controllerName": "AccountExtended",
+          "controllerGroupName": null,
+          "isRemoteService": false,
+          "isIntegrationService": false,
+          "apiVersion": null,
+          "type": "Tabebify.Controllers.AccountExtendedController",
+          "interfaces": [],
+          "actions": {
+            "LogoutMobile": {
+              "uniqueName": "LogoutMobile",
+              "name": "LogoutMobile",
+              "httpMethod": "POST",
+              "url": "api/account/logout-mobile",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "Microsoft.AspNetCore.Mvc.IActionResult",
+                "typeSimple": "Microsoft.AspNetCore.Mvc.IActionResult"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Controllers.AccountExtendedController"
+            },
+            "GetSessionStatus": {
+              "uniqueName": "GetSessionStatus",
+              "name": "GetSessionStatus",
+              "httpMethod": "GET",
+              "url": "api/account/session-status",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "Microsoft.AspNetCore.Mvc.IActionResult",
+                "typeSimple": "Microsoft.AspNetCore.Mvc.IActionResult"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Controllers.AccountExtendedController"
+            }
+          }
+        },
+        "Tabebify.Files.FileAppService": {
+          "controllerName": "File",
+          "controllerGroupName": "File",
+          "isRemoteService": true,
+          "isIntegrationService": false,
+          "apiVersion": null,
+          "type": "Tabebify.Files.FileAppService",
+          "interfaces": [
+            {
+              "type": "Tabebify.Files.IFileAppService",
+              "name": "IFileAppService",
+              "methods": [
+                {
+                  "name": "UploadAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "file",
+                      "typeAsString": "Volo.Abp.Content.IRemoteStreamContent, Volo.Abp.Core",
+                      "type": "Volo.Abp.Content.IRemoteStreamContent",
+                      "typeSimple": "Volo.Abp.Content.IRemoteStreamContent",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Tabebify.Dtos.Files.UploadFileResultDto",
+                    "typeSimple": "Tabebify.Dtos.Files.UploadFileResultDto"
+                  }
+                },
+                {
+                  "name": "UploadBase64Async",
+                  "parametersOnMethod": [
+                    {
+                      "name": "input",
+                      "typeAsString": "Tabebify.Dtos.Files.UploadBase64Input, Tabebify.Application.Contracts",
+                      "type": "Tabebify.Dtos.Files.UploadBase64Input",
+                      "typeSimple": "Tabebify.Dtos.Files.UploadBase64Input",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Tabebify.Dtos.Files.UploadFileResultDto",
+                    "typeSimple": "Tabebify.Dtos.Files.UploadFileResultDto"
+                  }
+                },
+                {
+                  "name": "GetAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "storageName",
+                      "typeAsString": "System.String, System.Private.CoreLib",
+                      "type": "System.String",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Volo.Abp.Content.IRemoteStreamContent",
+                    "typeSimple": "Volo.Abp.Content.IRemoteStreamContent"
+                  }
+                }
+              ]
+            }
+          ],
+          "actions": {
+            "UploadAsyncByFile": {
+              "uniqueName": "UploadAsyncByFile",
+              "name": "UploadAsync",
+              "httpMethod": "POST",
+              "url": "api/app/file/upload",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "file",
+                  "typeAsString": "Volo.Abp.Content.IRemoteStreamContent, Volo.Abp.Core",
+                  "type": "Volo.Abp.Content.IRemoteStreamContent",
+                  "typeSimple": "Volo.Abp.Content.IRemoteStreamContent",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "file",
+                  "name": "file",
+                  "jsonName": null,
+                  "type": "Volo.Abp.Content.IRemoteStreamContent",
+                  "typeSimple": "Volo.Abp.Content.IRemoteStreamContent",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "FormFile",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Dtos.Files.UploadFileResultDto",
+                "typeSimple": "Tabebify.Dtos.Files.UploadFileResultDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Files.IFileAppService"
+            },
+            "UploadBase64AsyncByInput": {
+              "uniqueName": "UploadBase64AsyncByInput",
+              "name": "UploadBase64Async",
+              "httpMethod": "POST",
+              "url": "api/app/file/upload-base64",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "Tabebify.Dtos.Files.UploadBase64Input, Tabebify.Application.Contracts",
+                  "type": "Tabebify.Dtos.Files.UploadBase64Input",
+                  "typeSimple": "Tabebify.Dtos.Files.UploadBase64Input",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "Tabebify.Dtos.Files.UploadBase64Input",
+                  "typeSimple": "Tabebify.Dtos.Files.UploadBase64Input",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Dtos.Files.UploadFileResultDto",
+                "typeSimple": "Tabebify.Dtos.Files.UploadFileResultDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Files.IFileAppService"
+            },
+            "GetAsyncByStorageName": {
+              "uniqueName": "GetAsyncByStorageName",
+              "name": "GetAsync",
+              "httpMethod": "GET",
+              "url": "api/app/file",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "storageName",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "storageName",
+                  "name": "storageName",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Volo.Abp.Content.IRemoteStreamContent",
+                "typeSimple": "Volo.Abp.Content.IRemoteStreamContent"
+              },
+              "allowAnonymous": true,
+              "implementFrom": "Tabebify.Files.IFileAppService"
+            }
+          }
+        },
         "Tabebify.Notifications.DeviceTokenAppService": {
           "controllerName": "DeviceToken",
           "controllerGroupName": "DeviceToken",
@@ -3772,6 +3993,69 @@
             }
           }
         },
+        "Tabebify.Providers.ProviderProfileAppService": {
+          "controllerName": "ProviderProfile",
+          "controllerGroupName": "ProviderProfile",
+          "isRemoteService": true,
+          "isIntegrationService": false,
+          "apiVersion": null,
+          "type": "Tabebify.Providers.ProviderProfileAppService",
+          "interfaces": [],
+          "actions": {
+            "GetAsync": {
+              "uniqueName": "GetAsync",
+              "name": "GetAsync",
+              "httpMethod": "GET",
+              "url": "api/app/provider-profile",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "Tabebify.Providers.ProviderProfileDto",
+                "typeSimple": "Tabebify.Providers.ProviderProfileDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Providers.ProviderProfileAppService"
+            },
+            "UpdateAsyncByInput": {
+              "uniqueName": "UpdateAsyncByInput",
+              "name": "UpdateAsync",
+              "httpMethod": "PUT",
+              "url": "api/app/provider-profile",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "Tabebify.Dtos.Providers.UpdateProviderProfileDto, Tabebify.Application.Contracts",
+                  "type": "Tabebify.Dtos.Providers.UpdateProviderProfileDto",
+                  "typeSimple": "Tabebify.Dtos.Providers.UpdateProviderProfileDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "Tabebify.Dtos.Providers.UpdateProviderProfileDto",
+                  "typeSimple": "Tabebify.Dtos.Providers.UpdateProviderProfileDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Providers.ProviderProfileDto",
+                "typeSimple": "Tabebify.Providers.ProviderProfileDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Providers.ProviderProfileAppService"
+            }
+          }
+        },
         "Tabebify.Providers.ProviderStatsAppService": {
           "controllerName": "ProviderStats",
           "controllerGroupName": "ProviderStats",
@@ -4075,6 +4359,80 @@
             }
           ],
           "actions": {
+            "RegisterAsyncByInput": {
+              "uniqueName": "RegisterAsyncByInput",
+              "name": "RegisterAsync",
+              "httpMethod": "POST",
+              "url": "api/app/tabebify-account/register",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "Tabebify.Auth.RegisterDto, Tabebify.Application.Contracts",
+                  "type": "Tabebify.Auth.RegisterDto",
+                  "typeSimple": "Tabebify.Auth.RegisterDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "Tabebify.Auth.RegisterDto",
+                  "typeSimple": "Tabebify.Auth.RegisterDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Auth.AuthResultDto",
+                "typeSimple": "Tabebify.Auth.AuthResultDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "Tabebify.Services.Auth.TabebifyAccountAppService"
+            },
+            "VerifyRegistrationOtpAsyncByInput": {
+              "uniqueName": "VerifyRegistrationOtpAsyncByInput",
+              "name": "VerifyRegistrationOtpAsync",
+              "httpMethod": "POST",
+              "url": "api/app/tabebify-account/verify-registration-otp",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "Tabebify.Dtos.Auth.VerifyOtpInputDto, Tabebify.Application.Contracts",
+                  "type": "Tabebify.Dtos.Auth.VerifyOtpInputDto",
+                  "typeSimple": "Tabebify.Dtos.Auth.VerifyOtpInputDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "Tabebify.Dtos.Auth.VerifyOtpInputDto",
+                  "typeSimple": "Tabebify.Dtos.Auth.VerifyOtpInputDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "Tabebify.Services.Auth.TabebifyAccountAppService"
+            },
             "SendResetPasswordVerificationAsyncByInput": {
               "uniqueName": "SendResetPasswordVerificationAsyncByInput",
               "name": "SendResetPasswordVerificationAsync",
@@ -4186,18 +4544,18 @@
               "allowAnonymous": null,
               "implementFrom": "Tabebify.Services.Auth.TabebifyAccountAppService"
             },
-            "RegisterAsyncByInput": {
-              "uniqueName": "RegisterAsyncByInput",
-              "name": "RegisterAsync",
+            "ResendRegistrationOtpAsyncByInput": {
+              "uniqueName": "ResendRegistrationOtpAsyncByInput",
+              "name": "ResendRegistrationOtpAsync",
               "httpMethod": "POST",
-              "url": "api/app/tabebify-account/register",
+              "url": "api/app/tabebify-account/resend-registration-otp",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
                   "name": "input",
-                  "typeAsString": "Tabebify.Auth.RegisterDto, Tabebify.Application.Contracts",
-                  "type": "Tabebify.Auth.RegisterDto",
-                  "typeSimple": "Tabebify.Auth.RegisterDto",
+                  "typeAsString": "Tabebify.Dtos.Auth.ResendOtpInputDto, Tabebify.Application.Contracts",
+                  "type": "Tabebify.Dtos.Auth.ResendOtpInputDto",
+                  "typeSimple": "Tabebify.Dtos.Auth.ResendOtpInputDto",
                   "isOptional": false,
                   "defaultValue": null
                 }
@@ -4207,8 +4565,8 @@
                   "nameOnMethod": "input",
                   "name": "input",
                   "jsonName": null,
-                  "type": "Tabebify.Auth.RegisterDto",
-                  "typeSimple": "Tabebify.Auth.RegisterDto",
+                  "type": "Tabebify.Dtos.Auth.ResendOtpInputDto",
+                  "typeSimple": "Tabebify.Dtos.Auth.ResendOtpInputDto",
                   "isOptional": false,
                   "defaultValue": null,
                   "constraintTypes": null,
@@ -4217,8 +4575,45 @@
                 }
               ],
               "returnValue": {
-                "type": "Tabebify.Auth.AuthResultDto",
-                "typeSimple": "Tabebify.Auth.AuthResultDto"
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "Tabebify.Services.Auth.TabebifyAccountAppService"
+            },
+            "ResendForgotPasswordOtpAsyncByInput": {
+              "uniqueName": "ResendForgotPasswordOtpAsyncByInput",
+              "name": "ResendForgotPasswordOtpAsync",
+              "httpMethod": "POST",
+              "url": "api/app/tabebify-account/resend-forgot-password-otp",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "Tabebify.Dtos.Auth.ResendOtpInputDto, Tabebify.Application.Contracts",
+                  "type": "Tabebify.Dtos.Auth.ResendOtpInputDto",
+                  "typeSimple": "Tabebify.Dtos.Auth.ResendOtpInputDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "Tabebify.Dtos.Auth.ResendOtpInputDto",
+                  "typeSimple": "Tabebify.Dtos.Auth.ResendOtpInputDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
               },
               "allowAnonymous": null,
               "implementFrom": "Tabebify.Services.Auth.TabebifyAccountAppService"
@@ -5311,6 +5706,86 @@
               },
               "allowAnonymous": false,
               "implementFrom": "Tabebify.Services.IServiceCategoryAppService"
+            }
+          }
+        },
+        "Tabebify.UserDocuments.UserDocumentsAppService": {
+          "controllerName": "UserDocuments",
+          "controllerGroupName": "UserDocuments",
+          "isRemoteService": true,
+          "isIntegrationService": false,
+          "apiVersion": null,
+          "type": "Tabebify.UserDocuments.UserDocumentsAppService",
+          "interfaces": [],
+          "actions": {
+            "GetMyDocumentsAsyncByCt": {
+              "uniqueName": "GetMyDocumentsAsyncByCt",
+              "name": "GetMyDocumentsAsync",
+              "httpMethod": "GET",
+              "url": "api/app/user-documents/my-documents",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "ct",
+                  "typeAsString": "System.Threading.CancellationToken, System.Private.CoreLib",
+                  "type": "System.Threading.CancellationToken",
+                  "typeSimple": "System.Threading.CancellationToken",
+                  "isOptional": true,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [],
+              "returnValue": {
+                "type": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto>"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.UserDocuments.UserDocumentsAppService"
+            },
+            "UpsertMyDocumentsAsyncByInputAndCt": {
+              "uniqueName": "UpsertMyDocumentsAsyncByInputAndCt",
+              "name": "UpsertMyDocumentsAsync",
+              "httpMethod": "POST",
+              "url": "api/app/user-documents/upsert-my-documents",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "System.Collections.Generic.IEnumerable`1[[Tabebify.Dtos.UserDocuments.UserDocumentDto, Tabebify.Application.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib",
+                  "type": "System.Collections.Generic.IEnumerable<Tabebify.Dtos.UserDocuments.UserDocumentDto>",
+                  "typeSimple": "[Tabebify.Dtos.UserDocuments.UserDocumentDto]",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "ct",
+                  "typeAsString": "System.Threading.CancellationToken, System.Private.CoreLib",
+                  "type": "System.Threading.CancellationToken",
+                  "typeSimple": "System.Threading.CancellationToken",
+                  "isOptional": true,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "System.Collections.Generic.IEnumerable<Tabebify.Dtos.UserDocuments.UserDocumentDto>",
+                  "typeSimple": "[Tabebify.Dtos.UserDocuments.UserDocumentDto]",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Dtos.UserDocuments.UserDocumentDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Dtos.UserDocuments.UserDocumentDto>"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.UserDocuments.UserDocumentsAppService"
             }
           }
         }
@@ -7521,6 +7996,51 @@
     }
   },
   "types": {
+    "Microsoft.AspNetCore.Mvc.IActionResult": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": []
+    },
+    "Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid": {
+      "baseType": "System.Runtime.InteropServices.SafeHandle",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "IsInvalid",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Microsoft.Win32.SafeHandles.SafeWaitHandle": {
+      "baseType": "Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": []
+    },
+    "System.MarshalByRefObject": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": []
+    },
     "System.Nullable<T0>": {
       "baseType": "System.ValueType",
       "isEnum": false,
@@ -7545,6 +8065,125 @@
           "jsonName": null,
           "type": "T",
           "typeSimple": "T",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "System.Runtime.ConstrainedExecution.CriticalFinalizerObject": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": []
+    },
+    "System.Runtime.InteropServices.SafeHandle": {
+      "baseType": "System.Runtime.ConstrainedExecution.CriticalFinalizerObject",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "IsClosed",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "IsInvalid",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "System.Threading.CancellationToken": {
+      "baseType": "System.ValueType",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "IsCancellationRequested",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "CanBeCanceled",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "WaitHandle",
+          "jsonName": null,
+          "type": "System.Threading.WaitHandle",
+          "typeSimple": "System.Threading.WaitHandle",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "System.Threading.WaitHandle": {
+      "baseType": "System.MarshalByRefObject",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "Handle",
+          "jsonName": null,
+          "type": "System.IntPtr",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "SafeWaitHandle",
+          "jsonName": null,
+          "type": "Microsoft.Win32.SafeHandles.SafeWaitHandle",
+          "typeSimple": "Microsoft.Win32.SafeHandles.SafeWaitHandle",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,
@@ -7865,10 +8504,10 @@
       "genericArguments": null,
       "properties": [
         {
-          "name": "Status",
+          "name": "AccountStatus",
           "jsonName": null,
-          "type": "System.String",
-          "typeSimple": "string",
+          "type": "Tabebify.Profiles.ProviderAccountStatus?",
+          "typeSimple": "enum?",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,
@@ -7960,8 +8599,8 @@
         {
           "name": "AccountStatus",
           "jsonName": null,
-          "type": "System.String",
-          "typeSimple": "string",
+          "type": "Tabebify.Profiles.ProviderAccountStatus",
+          "typeSimple": "enum",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,
@@ -9539,7 +10178,7 @@
           "typeSimple": "string",
           "isRequired": false,
           "minLength": null,
-          "maxLength": null,
+          "maxLength": 256,
           "minimum": null,
           "maximum": null,
           "regex": null
@@ -10135,6 +10774,138 @@
         }
       ]
     },
+    "Tabebify.Dtos.Auth.ResendOtpInputDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "PhoneNumber",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": 8,
+          "maxLength": 15,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Tabebify.Dtos.Auth.VerifyOtpInputDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "PhoneNumber",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": 8,
+          "maxLength": 15,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "OtpCode",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": 6,
+          "maxLength": 6,
+          "minimum": null,
+          "maximum": null,
+          "regex": "^\\d{6}$"
+        }
+      ]
+    },
+    "Tabebify.Dtos.Files.UploadBase64Input": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "FileName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": null,
+          "maxLength": 255,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "ContentType",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": 128,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Base64Content",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Tabebify.Dtos.Files.UploadFileResultDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "StorageName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "StorageUrl",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
     "Tabebify.Dtos.Patients.AdminPatientFilterInput": {
       "baseType": "Volo.Abp.Application.Dtos.PagedAndSortedResultRequestDto",
       "isEnum": false,
@@ -10297,6 +11068,87 @@
         }
       ]
     },
+    "Tabebify.Dtos.Providers.UpdateProviderProfileDto": {
+      "baseType": "Volo.Abp.Application.Dtos.EntityDto<System.Guid>",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "FullName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Gender",
+          "jsonName": null,
+          "type": "Tabebify.Profiles.Gender",
+          "typeSimple": "enum",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "IsAvailable",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "LastLatitude",
+          "jsonName": null,
+          "type": "System.Double?",
+          "typeSimple": "number?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "LastLongitude",
+          "jsonName": null,
+          "type": "System.Double?",
+          "typeSimple": "number?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "PhoneNumber",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
     "Tabebify.Dtos.Services.AddServiceItemDto": {
       "baseType": null,
       "isEnum": false,
@@ -10378,6 +11230,156 @@
           "jsonName": null,
           "type": "System.Boolean",
           "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "IconUrl",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "Id",
+          "jsonName": null,
+          "type": "System.Guid",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "DocumentType",
+          "jsonName": null,
+          "type": "Tabebify.UserDocuments.DocumentType",
+          "typeSimple": "enum",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "FileUrl",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Status",
+          "jsonName": null,
+          "type": "Tabebify.UserDocuments.DocumentStatus",
+          "typeSimple": "enum",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "RejectionReason",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "ReviewedAt",
+          "jsonName": null,
+          "type": "System.DateTime?",
+          "typeSimple": "string?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "CreationTime",
+          "jsonName": null,
+          "type": "System.DateTime",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "LastModificationTime",
+          "jsonName": null,
+          "type": "System.DateTime?",
+          "typeSimple": "string?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Tabebify.Dtos.UserDocuments.UserDocumentDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "DocumentType",
+          "jsonName": null,
+          "type": "Tabebify.UserDocuments.DocumentType",
+          "typeSimple": "enum",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "FileUrl",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,
@@ -11400,6 +12402,150 @@
       "genericArguments": null,
       "properties": null
     },
+    "Tabebify.Profiles.ProviderAccountStatus": {
+      "baseType": "System.Enum",
+      "isEnum": true,
+      "enumNames": [
+        "PendingDocuments",
+        "PendingReview",
+        "Approved",
+        "Rejected",
+        "Suspended",
+        "UnverifiedPhone"
+      ],
+      "enumValues": [0, 1, 2, 3, 4, 5],
+      "genericArguments": null,
+      "properties": null
+    },
+    "Tabebify.Providers.ProviderProfileDto": {
+      "baseType": "Volo.Abp.Application.Dtos.EntityDto<System.Guid>",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "FullName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Email",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "PhoneNumber",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Gender",
+          "jsonName": null,
+          "type": "Tabebify.Profiles.Gender",
+          "typeSimple": "enum",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "IsAvailable",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "RatingAverage",
+          "jsonName": null,
+          "type": "System.Double",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "RatingCount",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "LastLatitude",
+          "jsonName": null,
+          "type": "System.Double?",
+          "typeSimple": "number?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "LastLongitude",
+          "jsonName": null,
+          "type": "System.Double?",
+          "typeSimple": "number?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "LastLocationUpdatedAt",
+          "jsonName": null,
+          "type": "System.DateTime?",
+          "typeSimple": "string?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
     "Tabebify.Providers.ProviderStatsDto": {
       "baseType": null,
       "isEnum": false,
@@ -12115,6 +13261,22 @@
       "enumValues": null,
       "genericArguments": null,
       "properties": []
+    },
+    "Tabebify.UserDocuments.DocumentStatus": {
+      "baseType": "System.Enum",
+      "isEnum": true,
+      "enumNames": ["Pending", "Approved", "Rejected", "AdditionalRequested"],
+      "enumValues": [0, 1, 2, 3],
+      "genericArguments": null,
+      "properties": null
+    },
+    "Tabebify.UserDocuments.DocumentType": {
+      "baseType": "System.Enum",
+      "isEnum": true,
+      "enumNames": ["NationalId", "License", "Certificate"],
+      "enumValues": [0, 1, 2],
+      "genericArguments": null,
+      "properties": null
     },
     "Volo.Abp.Account.ChangePasswordInput": {
       "baseType": null,
@@ -14828,6 +15990,51 @@
           "jsonName": null,
           "type": "System.Boolean",
           "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Volo.Abp.Content.IRemoteStreamContent": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "FileName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "ContentType",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "ContentLength",
+          "jsonName": null,
+          "type": "System.Int64?",
+          "typeSimple": "number?",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,

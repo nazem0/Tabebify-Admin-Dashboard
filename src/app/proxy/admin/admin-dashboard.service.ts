@@ -68,7 +68,7 @@ export class AdminDashboardService {
         method: 'GET',
         url: '/api/app/admin-dashboard/providers',
         params: {
-          status: input.status,
+          accountStatus: input.accountStatus,
           filter: input.filter,
           skipCount: input.skipCount,
           maxResultCount: input.maxResultCount,

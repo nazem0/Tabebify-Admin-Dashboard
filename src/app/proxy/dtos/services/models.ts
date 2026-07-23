@@ -8,4 +8,5 @@ export interface CreateUpdateItemDto {
   name: string;
   defaultPrice: number;
   isActive?: boolean;
+  iconUrl?: string;
 }

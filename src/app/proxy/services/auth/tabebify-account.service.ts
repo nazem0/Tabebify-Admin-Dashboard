@@ -6,7 +6,11 @@ import type {
   ResetPasswordByEmailInputDto,
   ResetPasswordByOtpInputDto,
 } from '../../auth/models';
-import type { ForgotPasswordInputDto } from '../../dtos/auth/models';
+import type {
+  ForgotPasswordInputDto,
+  ResendOtpInputDto,
+  VerifyOtpInputDto,
+} from '../../dtos/auth/models';
 import type {
   ResetPasswordDto,
   SendPasswordResetCodeDto,
@@ -53,6 +57,26 @@ export class TabebifyAccountService {
       { apiName: this.apiName, ...config },
     );
 
+  resendForgotPasswordOtp = (input: ResendOtpInputDto, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, void>(
+      {
+        method: 'POST',
+        url: '/api/app/tabebify-account/resend-forgot-password-otp',
+        body: input,
+      },
+      { apiName: this.apiName, ...config },
+    );
+
+  resendRegistrationOtp = (input: ResendOtpInputDto, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, void>(
+      {
+        method: 'POST',
+        url: '/api/app/tabebify-account/resend-registration-otp',
+        body: input,
+      },
+      { apiName: this.apiName, ...config },
+    );
+
   resetPassword = (input: ResetPasswordDto, config?: Partial<Rest.Config>) =>
     this.restService.request<any, void>(
       {
@@ -91,6 +115,16 @@ export class TabebifyAccountService {
       {
         method: 'POST',
         url: '/api/app/tabebify-account/verify-password-reset-token',
+        body: input,
+      },
+      { apiName: this.apiName, ...config },
+    );
+
+  verifyRegistrationOtp = (input: VerifyOtpInputDto, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, void>(
+      {
+        method: 'POST',
+        url: '/api/app/tabebify-account/verify-registration-otp',
         body: input,
       },
       { apiName: this.apiName, ...config },

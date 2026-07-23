@@ -1,3 +1,5 @@
+import type { ProviderAccountStatus } from '../profiles/provider-account-status.enum';
+
 export interface AdminAnalyticsDto {
   totalUsers?: number;
   usersGrowthPercentage?: number;
@@ -31,7 +33,7 @@ export interface AdminPatientUpdateDto {
 }
 
 export interface AdminProviderFilterInput {
-  status?: string;
+  accountStatus?: ProviderAccountStatus;
   filter?: string;
   skipCount?: number;
   maxResultCount?: number;
@@ -41,7 +43,7 @@ export interface AdminProviderListDto {
   id?: string;
   fullName?: string;
   email?: string;
-  accountStatus?: string;
+  accountStatus?: ProviderAccountStatus;
   ratingAverage?: number;
   ratingCount?: number;
   isAvailable?: boolean;
