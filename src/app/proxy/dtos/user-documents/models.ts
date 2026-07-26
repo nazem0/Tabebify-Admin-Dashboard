@@ -1,6 +1,10 @@
 import type { DocumentType } from '../../user-documents/document-type.enum';
 import type { DocumentStatus } from '../../user-documents/document-status.enum';
 
+export interface RejectUserDocumentDto {
+  rejectionReason: string;
+}
+
 export interface UserDocumentDetailsDto {
   id?: string;
   documentType?: DocumentType;
@@ -10,9 +14,4 @@ export interface UserDocumentDetailsDto {
   reviewedAt?: string;
   creationTime?: string;
   lastModificationTime?: string;
-}
-
-export interface UserDocumentDto {
-  documentType?: DocumentType;
-  fileUrl?: string;
 }

@@ -8,6 +8,11 @@ export interface AuthResultDto {
   role?: string;
 }
 
+export interface DeleteAccountResultDto {
+  success?: boolean;
+  message?: string;
+}
+
 export interface ProviderVerificationDto {
   providerId: string;
   action: VerificationAction;

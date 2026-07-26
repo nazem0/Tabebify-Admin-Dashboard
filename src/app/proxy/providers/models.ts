@@ -1,8 +1,10 @@
 import type { EntityDto } from '@abp/ng.core';
+import type { ProviderAccountStatus } from '../profiles/provider-account-status.enum';
 import type { Gender } from '../profiles/gender.enum';
 
 export interface ProviderProfileDto extends EntityDto<string> {
   fullName?: string;
+  accountStatus?: ProviderAccountStatus;
   email?: string;
   phoneNumber?: string;
   gender?: Gender;

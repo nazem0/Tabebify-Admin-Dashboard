@@ -2360,6 +2360,14 @@
                     "type": "Tabebify.Auth.AuthResultDto",
                     "typeSimple": "Tabebify.Auth.AuthResultDto"
                   }
+                },
+                {
+                  "name": "DeleteMyAccountAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "Tabebify.Auth.DeleteAccountResultDto",
+                    "typeSimple": "Tabebify.Auth.DeleteAccountResultDto"
+                  }
                 }
               ]
             }
@@ -2398,6 +2406,21 @@
               "returnValue": {
                 "type": "Tabebify.Auth.AuthResultDto",
                 "typeSimple": "Tabebify.Auth.AuthResultDto"
+              },
+              "allowAnonymous": true,
+              "implementFrom": "Tabebify.Auth.IAccountAppService"
+            },
+            "DeleteMyAccountAsync": {
+              "uniqueName": "DeleteMyAccountAsync",
+              "name": "DeleteMyAccountAsync",
+              "httpMethod": "DELETE",
+              "url": "api/account/me",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "Tabebify.Auth.DeleteAccountResultDto",
+                "typeSimple": "Tabebify.Auth.DeleteAccountResultDto"
               },
               "allowAnonymous": true,
               "implementFrom": "Tabebify.Auth.IAccountAppService"
@@ -5709,6 +5732,192 @@
             }
           }
         },
+        "Tabebify.UserDocuments.AdminUserDocumentsAppService": {
+          "controllerName": "AdminUserDocuments",
+          "controllerGroupName": "AdminUserDocuments",
+          "isRemoteService": true,
+          "isIntegrationService": false,
+          "apiVersion": null,
+          "type": "Tabebify.UserDocuments.AdminUserDocumentsAppService",
+          "interfaces": [
+            {
+              "type": "Tabebify.UserDocuments.IAdminUserDocumentsAppService",
+              "name": "IAdminUserDocumentsAppService",
+              "methods": [
+                {
+                  "name": "ApproveAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "id",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    },
+                    {
+                      "name": "ct",
+                      "typeAsString": "System.Threading.CancellationToken, System.Private.CoreLib",
+                      "type": "System.Threading.CancellationToken",
+                      "typeSimple": "System.Threading.CancellationToken",
+                      "isOptional": true,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Tabebify.Admin.AdminDocumentDto",
+                    "typeSimple": "Tabebify.Admin.AdminDocumentDto"
+                  }
+                },
+                {
+                  "name": "RejectAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "id",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    },
+                    {
+                      "name": "input",
+                      "typeAsString": "Tabebify.Dtos.UserDocuments.RejectUserDocumentDto, Tabebify.Application.Contracts",
+                      "type": "Tabebify.Dtos.UserDocuments.RejectUserDocumentDto",
+                      "typeSimple": "Tabebify.Dtos.UserDocuments.RejectUserDocumentDto",
+                      "isOptional": false,
+                      "defaultValue": null
+                    },
+                    {
+                      "name": "ct",
+                      "typeAsString": "System.Threading.CancellationToken, System.Private.CoreLib",
+                      "type": "System.Threading.CancellationToken",
+                      "typeSimple": "System.Threading.CancellationToken",
+                      "isOptional": true,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Tabebify.Admin.AdminDocumentDto",
+                    "typeSimple": "Tabebify.Admin.AdminDocumentDto"
+                  }
+                }
+              ]
+            }
+          ],
+          "actions": {
+            "ApproveAsyncByIdAndCt": {
+              "uniqueName": "ApproveAsyncByIdAndCt",
+              "name": "ApproveAsync",
+              "httpMethod": "POST",
+              "url": "api/admin/documents/{id}/approve",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "ct",
+                  "typeAsString": "System.Threading.CancellationToken, System.Private.CoreLib",
+                  "type": "System.Threading.CancellationToken",
+                  "typeSimple": "System.Threading.CancellationToken",
+                  "isOptional": true,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Admin.AdminDocumentDto",
+                "typeSimple": "Tabebify.Admin.AdminDocumentDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.UserDocuments.IAdminUserDocumentsAppService"
+            },
+            "RejectAsyncByIdAndInputAndCt": {
+              "uniqueName": "RejectAsyncByIdAndInputAndCt",
+              "name": "RejectAsync",
+              "httpMethod": "POST",
+              "url": "api/admin/documents/{id}/reject",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "input",
+                  "typeAsString": "Tabebify.Dtos.UserDocuments.RejectUserDocumentDto, Tabebify.Application.Contracts",
+                  "type": "Tabebify.Dtos.UserDocuments.RejectUserDocumentDto",
+                  "typeSimple": "Tabebify.Dtos.UserDocuments.RejectUserDocumentDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "ct",
+                  "typeAsString": "System.Threading.CancellationToken, System.Private.CoreLib",
+                  "type": "System.Threading.CancellationToken",
+                  "typeSimple": "System.Threading.CancellationToken",
+                  "isOptional": true,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "Tabebify.Dtos.UserDocuments.RejectUserDocumentDto",
+                  "typeSimple": "Tabebify.Dtos.UserDocuments.RejectUserDocumentDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Admin.AdminDocumentDto",
+                "typeSimple": "Tabebify.Admin.AdminDocumentDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.UserDocuments.IAdminUserDocumentsAppService"
+            }
+          }
+        },
         "Tabebify.UserDocuments.UserDocumentsAppService": {
           "controllerName": "UserDocuments",
           "controllerGroupName": "UserDocuments",
@@ -5751,9 +5960,9 @@
               "parametersOnMethod": [
                 {
                   "name": "input",
-                  "typeAsString": "System.Collections.Generic.IEnumerable`1[[Tabebify.Dtos.UserDocuments.UserDocumentDto, Tabebify.Application.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib",
-                  "type": "System.Collections.Generic.IEnumerable<Tabebify.Dtos.UserDocuments.UserDocumentDto>",
-                  "typeSimple": "[Tabebify.Dtos.UserDocuments.UserDocumentDto]",
+                  "typeAsString": "System.Collections.Generic.IEnumerable`1[[Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto, Tabebify.Application.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib",
+                  "type": "System.Collections.Generic.IEnumerable<Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto>",
+                  "typeSimple": "[Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto]",
                   "isOptional": false,
                   "defaultValue": null
                 },
@@ -5771,8 +5980,8 @@
                   "nameOnMethod": "input",
                   "name": "input",
                   "jsonName": null,
-                  "type": "System.Collections.Generic.IEnumerable<Tabebify.Dtos.UserDocuments.UserDocumentDto>",
-                  "typeSimple": "[Tabebify.Dtos.UserDocuments.UserDocumentDto]",
+                  "type": "System.Collections.Generic.IEnumerable<Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto>",
+                  "typeSimple": "[Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto]",
                   "isOptional": false,
                   "defaultValue": null,
                   "constraintTypes": null,
@@ -5781,8 +5990,8 @@
                 }
               ],
               "returnValue": {
-                "type": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Dtos.UserDocuments.UserDocumentDto>",
-                "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Dtos.UserDocuments.UserDocumentDto>"
+                "type": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto>"
               },
               "allowAnonymous": false,
               "implementFrom": "Tabebify.UserDocuments.UserDocumentsAppService"
@@ -10107,6 +10316,39 @@
         }
       ]
     },
+    "Tabebify.Auth.DeleteAccountResultDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "Success",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Message",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
     "Tabebify.Auth.ProviderVerificationDto": {
       "baseType": null,
       "isEnum": false,
@@ -11251,6 +11493,27 @@
         }
       ]
     },
+    "Tabebify.Dtos.UserDocuments.RejectUserDocumentDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "RejectionReason",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": null,
+          "maxLength": 1000,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
     "Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto": {
       "baseType": null,
       "isEnum": false,
@@ -11347,39 +11610,6 @@
           "jsonName": null,
           "type": "System.DateTime?",
           "typeSimple": "string?",
-          "isRequired": false,
-          "minLength": null,
-          "maxLength": null,
-          "minimum": null,
-          "maximum": null,
-          "regex": null
-        }
-      ]
-    },
-    "Tabebify.Dtos.UserDocuments.UserDocumentDto": {
-      "baseType": null,
-      "isEnum": false,
-      "enumNames": null,
-      "enumValues": null,
-      "genericArguments": null,
-      "properties": [
-        {
-          "name": "DocumentType",
-          "jsonName": null,
-          "type": "Tabebify.UserDocuments.DocumentType",
-          "typeSimple": "enum",
-          "isRequired": false,
-          "minLength": null,
-          "maxLength": null,
-          "minimum": null,
-          "maximum": null,
-          "regex": null
-        },
-        {
-          "name": "FileUrl",
-          "jsonName": null,
-          "type": "System.String",
-          "typeSimple": "string",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,
@@ -12429,6 +12659,18 @@
           "jsonName": null,
           "type": "System.String",
           "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "AccountStatus",
+          "jsonName": null,
+          "type": "Tabebify.Profiles.ProviderAccountStatus",
+          "typeSimple": "enum",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,
