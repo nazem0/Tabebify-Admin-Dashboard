@@ -63,14 +63,38 @@ function resolveUserOrProvider(raw: string): BadgeStyle {
   }
 }
 
-function resolveDocument(raw: string): BadgeStyle {
-  switch (raw) {
+/** Maps DocumentStatus enum values (0–3) and common string names. */
+function resolveDocument(raw: string | number): BadgeStyle {
+  const num =
+    typeof raw === 'number'
+      ? raw
+      : typeof raw === 'string' && /^\d+$/.test(raw)
+        ? Number(raw)
+        : NaN;
+
+  if (Number.isInteger(num)) {
+    switch (num) {
+      case 1:
+        return { classes: 'bg-green-100 text-green-800', label: 'Approved',              dot: 'bg-green-500', pulse: false };
+      case 2:
+        return { classes: 'bg-red-100 text-red-800',     label: 'Rejected',              dot: 'bg-red-500',   pulse: false };
+      case 3:
+        return { classes: 'bg-amber-100 text-amber-800', label: 'Additional Requested',  dot: 'bg-amber-500', pulse: false };
+      default:
+        return { classes: 'bg-amber-100 text-amber-800', label: 'Pending',               dot: 'bg-amber-500', pulse: false };
+    }
+  }
+
+  switch (String(raw).toLowerCase()) {
     case 'approved':
-      return { classes: 'bg-green-100 text-green-800', label: 'Approved', dot: 'bg-green-500', pulse: false };
+      return { classes: 'bg-green-100 text-green-800', label: 'Approved',              dot: 'bg-green-500', pulse: false };
     case 'rejected':
-      return { classes: 'bg-red-100 text-red-800',     label: 'Rejected', dot: 'bg-red-500',   pulse: false };
+      return { classes: 'bg-red-100 text-red-800',     label: 'Rejected',              dot: 'bg-red-500',   pulse: false };
+    case 'additionalrequested':
+    case 'additional_requested':
+      return { classes: 'bg-amber-100 text-amber-800', label: 'Additional Requested',  dot: 'bg-amber-500', pulse: false };
     default:
-      return { classes: 'bg-amber-100 text-amber-800', label: 'Pending',  dot: 'bg-amber-500', pulse: false };
+      return { classes: 'bg-amber-100 text-amber-800', label: 'Pending',               dot: 'bg-amber-500', pulse: false };
   }
 }
 
@@ -137,7 +161,7 @@ export class StatusBadgeComponent {
     }
 
     if (scheme === 'document') {
-      return resolveDocument(raw);
+      return resolveDocument(s);
     }
 
     return { ...FALLBACK, label: String(s) };

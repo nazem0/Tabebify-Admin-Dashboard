@@ -134,7 +134,10 @@
     [provider]="docProvider()"
     [documents]="documents()"
     [isLoading]="isLoadingDocs()"
+    [processingDocId]="processingDocId()"
     (close)="closeDocuments()"
+    (approveDocument)="approveDocument($event)"
+    (rejectDocument)="rejectDocument($event)"
   />
 }
 <!-- Create Nurse Modal -->

@@ -12,6 +12,7 @@ import { toast } from 'ngx-sonner';
 import { AdminDashboardService, AdminProviderListDto } from '../../../proxy/admin';
 import type { AdminDocumentDto } from '../../../proxy/admin/models';
 import { ProviderVerificationService, VerificationAction } from '../../../proxy/auth';
+import { AdminUserDocumentsService } from '../../../proxy/user-documents';
 import { IdentityUserService } from '../../../proxy/volo/abp/identity';
 import { UserStatusService } from '../../../core/services/user-status/user-status.service';
 import { AnalyticsCacheService } from '../../../core/services/analytics/analytics-cache.service';
@@ -84,6 +85,7 @@ protected readonly cols: TableColumn[] = [
   private readonly adminService = inject(AdminDashboardService);
   private readonly analyticsCache = inject(AnalyticsCacheService);
   private readonly verificationService = inject(ProviderVerificationService);
+  private readonly adminDocumentsService = inject(AdminUserDocumentsService);
   private readonly identityService = inject(IdentityUserService);
   private readonly userStatusService = inject(UserStatusService);
   private readonly destroyRef = inject(DestroyRef);
@@ -108,6 +110,7 @@ protected readonly cols: TableColumn[] = [
   protected readonly docProvider = signal<AdminProviderListDto | null>(null);
   protected readonly documents = signal<AdminDocumentDto[]>([]);
   protected readonly isLoadingDocs = signal(false);
+  protected readonly processingDocId = signal<string | null>(null);
 
   protected readonly showCreateModal = signal(false);
 
@@ -248,6 +251,7 @@ protected readonly cols: TableColumn[] = [
     this.profileProvider.set(null);
     this.docProvider.set(provider);
     this.documents.set([]);
+    this.processingDocId.set(null);
     this.isLoadingDocs.set(true);
     this.adminService.getProviderDocuments(provider.id).subscribe({
       next: result => {
@@ -261,6 +265,49 @@ protected readonly cols: TableColumn[] = [
   protected closeDocuments(): void {
     this.docProvider.set(null);
     this.documents.set([]);
+    this.processingDocId.set(null);
+  }
+
+  protected approveDocument(doc: AdminDocumentDto): void {
+    if (!doc.id || this.processingDocId()) return;
+    this.processingDocId.set(doc.id);
+    this.adminDocumentsService
+      .approve(doc.id)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.processingDocId.set(null)))
+      .subscribe({
+        next: updated => {
+          this.patchDocument(updated);
+          toast.success(`${doc.documentType ?? 'Document'} approved.`);
+          this.loadPendingNurses();
+          this.loadActiveNurses();
+        },
+        error: () => toast.error('Failed to approve document. Please try again.'),
+      });
+  }
+
+  protected rejectDocument(event: { document: AdminDocumentDto; rejectionReason: string }): void {
+    const { document: doc, rejectionReason } = event;
+    if (!doc.id || !rejectionReason.trim() || this.processingDocId()) return;
+    this.processingDocId.set(doc.id);
+    this.adminDocumentsService
+      .reject(doc.id, { rejectionReason: rejectionReason.trim() })
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.processingDocId.set(null)))
+      .subscribe({
+        next: updated => {
+          this.patchDocument(updated);
+          toast.success(`${doc.documentType ?? 'Document'} rejected.`);
+          this.loadPendingNurses();
+          this.loadActiveNurses();
+        },
+        error: () => toast.error('Failed to reject document. Please try again.'),
+      });
+  }
+
+  private patchDocument(updated: AdminDocumentDto): void {
+    if (!updated.id) return;
+    this.documents.update(list =>
+      list.map(d => (d.id === updated.id ? { ...d, ...updated } : d)),
+    );
   }
 
   // ── Create Nurse — form state owned by NurseCreateFormComponent ───────────

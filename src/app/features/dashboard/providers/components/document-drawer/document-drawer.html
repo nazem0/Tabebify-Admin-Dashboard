@@ -26,7 +26,7 @@
         >{{ provider()!.fullName | initials }}</div>
         <div class="min-w-0">
           <h2 class="font-headline-md text-primary truncate">{{ provider()!.fullName ?? '—' }}</h2>
-          <p class="text-[12px] text-on-surface-variant">Submitted documents</p>
+          <p class="text-[12px] text-on-surface-variant">Review &amp; approve submitted documents</p>
         </div>
       }
     </div>
@@ -105,11 +105,78 @@
               </div>
             }
 
-            <!-- Rejection reason -->
+            <!-- Rejection reason (already rejected) -->
             @if (doc.rejectionReason) {
               <div class="mx-5 mb-4 flex items-start gap-2 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
                 <span class="material-symbols-outlined text-[16px] mt-0.5 shrink-0 pointer-events-none" aria-hidden="true">info</span>
                 <span>{{ doc.rejectionReason }}</span>
+              </div>
+            }
+
+            <!-- Approve / Reject actions for pending docs -->
+            @if (isPending(doc)) {
+              <div class="px-5 pb-5 space-y-3">
+                @if (rejectingDocId() === doc.id) {
+                  <div class="space-y-3 rounded-xl border border-error/20 bg-error/5 p-4">
+                    <label class="block text-sm font-semibold text-primary" [attr.for]="'reject-reason-' + doc.id">
+                      Rejection reason
+                    </label>
+                    <textarea
+                      [id]="'reject-reason-' + doc.id"
+                      class="w-full min-h-[88px] rounded-xl border border-outline-variant/40 bg-white px-3 py-2.5 text-sm text-primary placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-error/30 resize-y"
+                      placeholder="Explain why this document is being rejected…"
+                      [ngModel]="rejectionReason()"
+                      (ngModelChange)="rejectionReason.set($event)"
+                      [disabled]="isProcessing(doc)"
+                    ></textarea>
+                    <div class="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        class="py-2.5 rounded-xl border border-outline-variant font-semibold text-label-sm text-on-surface-variant hover:bg-white transition-colors disabled:opacity-50"
+                        [disabled]="isProcessing(doc)"
+                        (click)="cancelReject()"
+                      >Cancel</button>
+                      <button
+                        type="button"
+                        class="py-2.5 rounded-xl bg-error text-white font-semibold text-label-sm hover:opacity-90 transition-all disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
+                        [disabled]="isProcessing(doc) || !rejectionReason().trim()"
+                        (click)="confirmReject(doc)"
+                      >
+                        @if (isProcessing(doc)) {
+                          <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
+                          Rejecting…
+                        } @else {
+                          Confirm Reject
+                        }
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      class="py-2.5 bg-primary text-white rounded-xl font-bold text-label-sm transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-1.5"
+                      [disabled]="processingDocId() !== null"
+                      (click)="onApprove(doc)"
+                      [attr.aria-label]="'Approve ' + (doc.documentType ?? 'document')"
+                    >
+                      @if (isProcessing(doc)) {
+                        <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
+                        Approving…
+                      } @else {
+                        <span class="material-symbols-outlined text-[16px] pointer-events-none" aria-hidden="true">check_circle</span>
+                        Approve
+                      }
+                    </button>
+                    <button
+                      type="button"
+                      class="py-2.5 border-2 border-error text-error rounded-xl font-bold text-label-sm transition-all hover:bg-error/5 disabled:opacity-50"
+                      [disabled]="processingDocId() !== null"
+                      (click)="startReject(doc)"
+                      [attr.aria-label]="'Reject ' + (doc.documentType ?? 'document')"
+                    >Reject</button>
+                  </div>
+                }
               </div>
             }
 
