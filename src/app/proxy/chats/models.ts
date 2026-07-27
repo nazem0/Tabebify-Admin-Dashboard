@@ -19,11 +19,41 @@ export interface ChatMessageDto {
   createdAt?: string;
 }
 
+export interface CreateSupportFaqDto {
+  question: string;
+  answer: string;
+  category: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
 export interface GetChatMessagesInput {
   before?: string;
   maxResultCount?: number;
 }
 
+export interface GetChatsInput {
+  skipCount?: number;
+  maxResultCount?: number;
+}
+
 export interface SendMessageDto {
   content: string;
+}
+
+export interface SupportFaqDto {
+  id?: string;
+  question?: string;
+  answer?: string;
+  category?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
+export interface UpdateSupportFaqDto {
+  question: string;
+  answer: string;
+  category: string;
+  sortOrder?: number;
+  isActive?: boolean;
 }

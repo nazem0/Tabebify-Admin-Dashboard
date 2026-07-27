@@ -1011,6 +1011,30 @@
                 },
                 {
                   "nameOnMethod": "input",
+                  "name": "IsAvailable",
+                  "jsonName": null,
+                  "type": "System.Boolean?",
+                  "typeSimple": "boolean?",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "OnlyWithoutActiveAssignment",
+                  "jsonName": null,
+                  "type": "System.Boolean?",
+                  "typeSimple": "boolean?",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
                   "name": "Filter",
                   "jsonName": null,
                   "type": "System.String",
@@ -1505,6 +1529,31 @@
                     "type": "Tabebify.Appointments.AppointmentDetailDto",
                     "typeSimple": "Tabebify.Appointments.AppointmentDetailDto"
                   }
+                },
+                {
+                  "name": "AssignProviderAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "appointmentId",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    },
+                    {
+                      "name": "providerId",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "System.Void",
+                    "typeSimple": "System.Void"
+                  }
                 }
               ]
             }
@@ -1883,6 +1932,63 @@
               "returnValue": {
                 "type": "Tabebify.Appointments.AppointmentDetailDto",
                 "typeSimple": "Tabebify.Appointments.AppointmentDetailDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Appointments.IAppointmentAppService"
+            },
+            "AssignProviderAsyncByAppointmentIdAndProviderId": {
+              "uniqueName": "AssignProviderAsyncByAppointmentIdAndProviderId",
+              "name": "AssignProviderAsync",
+              "httpMethod": "POST",
+              "url": "api/app/appointment/assign-provider",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "appointmentId",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "providerId",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "appointmentId",
+                  "name": "appointmentId",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "providerId",
+                  "name": "providerId",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
               },
               "allowAnonymous": false,
               "implementFrom": "Tabebify.Appointments.IAppointmentAppService"
@@ -2513,10 +2619,19 @@
               "methods": [
                 {
                   "name": "GetChatsAsync",
-                  "parametersOnMethod": [],
+                  "parametersOnMethod": [
+                    {
+                      "name": "input",
+                      "typeAsString": "Tabebify.Chats.GetChatsInput, Tabebify.Application.Contracts",
+                      "type": "Tabebify.Chats.GetChatsInput",
+                      "typeSimple": "Tabebify.Chats.GetChatsInput",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
                   "returnValue": {
-                    "type": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Chats.ChatDto>",
-                    "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Chats.ChatDto>"
+                    "type": "Volo.Abp.Application.Dtos.PagedResultDto<Tabebify.Chats.ChatDto>",
+                    "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<Tabebify.Chats.ChatDto>"
                   }
                 },
                 {
@@ -2570,28 +2685,150 @@
                   }
                 },
                 {
-                  "name": "GetOrCreateSupportChatAsync",
+                  "name": "CreateOrGetSupportChatAsync",
                   "parametersOnMethod": [],
                   "returnValue": {
                     "type": "Tabebify.Chats.ChatDto",
                     "typeSimple": "Tabebify.Chats.ChatDto"
+                  }
+                },
+                {
+                  "name": "GetOrCreateAppointmentChatAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "appointmentId",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Tabebify.Chats.ChatDto",
+                    "typeSimple": "Tabebify.Chats.ChatDto"
+                  }
+                },
+                {
+                  "name": "GetChatAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "chatId",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Tabebify.Chats.ChatDto",
+                    "typeSimple": "Tabebify.Chats.ChatDto"
+                  }
+                },
+                {
+                  "name": "MarkAsReadAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "chatId",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "System.Void",
+                    "typeSimple": "System.Void"
                   }
                 }
               ]
             }
           ],
           "actions": {
-            "GetChatsAsync": {
-              "uniqueName": "GetChatsAsync",
+            "GetChatsAsyncByInput": {
+              "uniqueName": "GetChatsAsyncByInput",
               "name": "GetChatsAsync",
               "httpMethod": "GET",
-              "url": "api/app/chat/chats",
+              "url": "chats",
               "supportedVersions": [],
-              "parametersOnMethod": [],
-              "parameters": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "Tabebify.Chats.GetChatsInput, Tabebify.Application.Contracts",
+                  "type": "Tabebify.Chats.GetChatsInput",
+                  "typeSimple": "Tabebify.Chats.GetChatsInput",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "SkipCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "MaxResultCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                }
+              ],
               "returnValue": {
-                "type": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Chats.ChatDto>",
-                "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Chats.ChatDto>"
+                "type": "Volo.Abp.Application.Dtos.PagedResultDto<Tabebify.Chats.ChatDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<Tabebify.Chats.ChatDto>"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Chats.IChatAppService"
+            },
+            "GetChatAsyncByChatId": {
+              "uniqueName": "GetChatAsyncByChatId",
+              "name": "GetChatAsync",
+              "httpMethod": "GET",
+              "url": "{chatId}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "chatId",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "chatId",
+                  "name": "chatId",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Chats.ChatDto",
+                "typeSimple": "Tabebify.Chats.ChatDto"
               },
               "allowAnonymous": false,
               "implementFrom": "Tabebify.Chats.IChatAppService"
@@ -2600,7 +2837,7 @@
               "uniqueName": "GetMessagesAsyncByChatIdAndInput",
               "name": "GetMessagesAsync",
               "httpMethod": "GET",
-              "url": "api/app/chat/messages/{chatId}",
+              "url": "messages/{chatId}",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -2665,11 +2902,48 @@
               "allowAnonymous": false,
               "implementFrom": "Tabebify.Chats.IChatAppService"
             },
+            "MarkAsReadAsyncByChatId": {
+              "uniqueName": "MarkAsReadAsyncByChatId",
+              "name": "MarkAsReadAsync",
+              "httpMethod": "POST",
+              "url": "mark-as-read/{chatId}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "chatId",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "chatId",
+                  "name": "chatId",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Chats.IChatAppService"
+            },
             "SendMessageAsyncByChatIdAndInput": {
               "uniqueName": "SendMessageAsyncByChatIdAndInput",
               "name": "SendMessageAsync",
               "httpMethod": "POST",
-              "url": "api/app/chat/send-message/{chatId}",
+              "url": "send-message/{chatId}",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -2722,11 +2996,11 @@
               "allowAnonymous": false,
               "implementFrom": "Tabebify.Chats.IChatAppService"
             },
-            "GetOrCreateSupportChatAsync": {
-              "uniqueName": "GetOrCreateSupportChatAsync",
-              "name": "GetOrCreateSupportChatAsync",
-              "httpMethod": "GET",
-              "url": "api/app/chat/or-create-support-chat",
+            "CreateOrGetSupportChatAsync": {
+              "uniqueName": "CreateOrGetSupportChatAsync",
+              "name": "CreateOrGetSupportChatAsync",
+              "httpMethod": "POST",
+              "url": "create-or-get-support-chat",
               "supportedVersions": [],
               "parametersOnMethod": [],
               "parameters": [],
@@ -2736,6 +3010,328 @@
               },
               "allowAnonymous": false,
               "implementFrom": "Tabebify.Chats.IChatAppService"
+            },
+            "GetOrCreateAppointmentChatAsyncByAppointmentId": {
+              "uniqueName": "GetOrCreateAppointmentChatAsyncByAppointmentId",
+              "name": "GetOrCreateAppointmentChatAsync",
+              "httpMethod": "POST",
+              "url": "or-create-appointment-chat/{appointmentId}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "appointmentId",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "appointmentId",
+                  "name": "appointmentId",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Chats.ChatDto",
+                "typeSimple": "Tabebify.Chats.ChatDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Chats.IChatAppService"
+            }
+          }
+        },
+        "Tabebify.Chats.SupportFaqAppService": {
+          "controllerName": "SupportFaq",
+          "controllerGroupName": "SupportFaq",
+          "isRemoteService": true,
+          "isIntegrationService": false,
+          "apiVersion": null,
+          "type": "Tabebify.Chats.SupportFaqAppService",
+          "interfaces": [
+            {
+              "type": "Tabebify.Chats.ISupportFaqAppService",
+              "name": "ISupportFaqAppService",
+              "methods": [
+                {
+                  "name": "GetListAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Chats.SupportFaqDto>",
+                    "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Chats.SupportFaqDto>"
+                  }
+                },
+                {
+                  "name": "GetAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "id",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Tabebify.Chats.SupportFaqDto",
+                    "typeSimple": "Tabebify.Chats.SupportFaqDto"
+                  }
+                },
+                {
+                  "name": "CreateAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "input",
+                      "typeAsString": "Tabebify.Chats.CreateSupportFaqDto, Tabebify.Application.Contracts",
+                      "type": "Tabebify.Chats.CreateSupportFaqDto",
+                      "typeSimple": "Tabebify.Chats.CreateSupportFaqDto",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Tabebify.Chats.SupportFaqDto",
+                    "typeSimple": "Tabebify.Chats.SupportFaqDto"
+                  }
+                },
+                {
+                  "name": "UpdateAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "id",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    },
+                    {
+                      "name": "input",
+                      "typeAsString": "Tabebify.Chats.UpdateSupportFaqDto, Tabebify.Application.Contracts",
+                      "type": "Tabebify.Chats.UpdateSupportFaqDto",
+                      "typeSimple": "Tabebify.Chats.UpdateSupportFaqDto",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Tabebify.Chats.SupportFaqDto",
+                    "typeSimple": "Tabebify.Chats.SupportFaqDto"
+                  }
+                },
+                {
+                  "name": "DeleteAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "id",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "System.Void",
+                    "typeSimple": "System.Void"
+                  }
+                }
+              ]
+            }
+          ],
+          "actions": {
+            "GetListAsync": {
+              "uniqueName": "GetListAsync",
+              "name": "GetListAsync",
+              "httpMethod": "GET",
+              "url": "api/app/support-faq",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Chats.SupportFaqDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<Tabebify.Chats.SupportFaqDto>"
+              },
+              "allowAnonymous": true,
+              "implementFrom": "Tabebify.Chats.ISupportFaqAppService"
+            },
+            "GetAsyncById": {
+              "uniqueName": "GetAsyncById",
+              "name": "GetAsync",
+              "httpMethod": "GET",
+              "url": "api/app/support-faq/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Chats.SupportFaqDto",
+                "typeSimple": "Tabebify.Chats.SupportFaqDto"
+              },
+              "allowAnonymous": true,
+              "implementFrom": "Tabebify.Chats.ISupportFaqAppService"
+            },
+            "CreateAsyncByInput": {
+              "uniqueName": "CreateAsyncByInput",
+              "name": "CreateAsync",
+              "httpMethod": "POST",
+              "url": "api/app/support-faq",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "Tabebify.Chats.CreateSupportFaqDto, Tabebify.Application.Contracts",
+                  "type": "Tabebify.Chats.CreateSupportFaqDto",
+                  "typeSimple": "Tabebify.Chats.CreateSupportFaqDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "Tabebify.Chats.CreateSupportFaqDto",
+                  "typeSimple": "Tabebify.Chats.CreateSupportFaqDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Chats.SupportFaqDto",
+                "typeSimple": "Tabebify.Chats.SupportFaqDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Chats.ISupportFaqAppService"
+            },
+            "UpdateAsyncByIdAndInput": {
+              "uniqueName": "UpdateAsyncByIdAndInput",
+              "name": "UpdateAsync",
+              "httpMethod": "PUT",
+              "url": "api/app/support-faq/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "input",
+                  "typeAsString": "Tabebify.Chats.UpdateSupportFaqDto, Tabebify.Application.Contracts",
+                  "type": "Tabebify.Chats.UpdateSupportFaqDto",
+                  "typeSimple": "Tabebify.Chats.UpdateSupportFaqDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "Tabebify.Chats.UpdateSupportFaqDto",
+                  "typeSimple": "Tabebify.Chats.UpdateSupportFaqDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "Tabebify.Chats.SupportFaqDto",
+                "typeSimple": "Tabebify.Chats.SupportFaqDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Chats.ISupportFaqAppService"
+            },
+            "DeleteAsyncById": {
+              "uniqueName": "DeleteAsyncById",
+              "name": "DeleteAsync",
+              "httpMethod": "DELETE",
+              "url": "api/app/support-faq/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "Tabebify.Chats.ISupportFaqAppService"
             }
           }
         },
@@ -5960,9 +6556,9 @@
               "parametersOnMethod": [
                 {
                   "name": "input",
-                  "typeAsString": "System.Collections.Generic.IEnumerable`1[[Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto, Tabebify.Application.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib",
-                  "type": "System.Collections.Generic.IEnumerable<Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto>",
-                  "typeSimple": "[Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto]",
+                  "typeAsString": "System.Collections.Generic.IEnumerable`1[[Tabebify.Dtos.UserDocuments.UserDocumentDto, Tabebify.Application.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib",
+                  "type": "System.Collections.Generic.IEnumerable<Tabebify.Dtos.UserDocuments.UserDocumentDto>",
+                  "typeSimple": "[Tabebify.Dtos.UserDocuments.UserDocumentDto]",
                   "isOptional": false,
                   "defaultValue": null
                 },
@@ -5980,8 +6576,8 @@
                   "nameOnMethod": "input",
                   "name": "input",
                   "jsonName": null,
-                  "type": "System.Collections.Generic.IEnumerable<Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto>",
-                  "typeSimple": "[Tabebify.Dtos.UserDocuments.UserDocumentDetailsDto]",
+                  "type": "System.Collections.Generic.IEnumerable<Tabebify.Dtos.UserDocuments.UserDocumentDto>",
+                  "typeSimple": "[Tabebify.Dtos.UserDocuments.UserDocumentDto]",
                   "isOptional": false,
                   "defaultValue": null,
                   "constraintTypes": null,
@@ -8706,7 +9302,7 @@
       ]
     },
     "Tabebify.Admin.AdminProviderFilterInput": {
-      "baseType": null,
+      "baseType": "Volo.Abp.Application.Dtos.PagedResultRequestDto",
       "isEnum": false,
       "enumNames": null,
       "enumValues": null,
@@ -8725,34 +9321,34 @@
           "regex": null
         },
         {
+          "name": "IsAvailable",
+          "jsonName": null,
+          "type": "System.Boolean?",
+          "typeSimple": "boolean?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "OnlyWithoutActiveAssignment",
+          "jsonName": null,
+          "type": "System.Boolean?",
+          "typeSimple": "boolean?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
           "name": "Filter",
           "jsonName": null,
           "type": "System.String",
           "typeSimple": "string",
-          "isRequired": false,
-          "minLength": null,
-          "maxLength": null,
-          "minimum": null,
-          "maximum": null,
-          "regex": null
-        },
-        {
-          "name": "SkipCount",
-          "jsonName": null,
-          "type": "System.Int32",
-          "typeSimple": "number",
-          "isRequired": false,
-          "minLength": null,
-          "maxLength": null,
-          "minimum": null,
-          "maximum": null,
-          "regex": null
-        },
-        {
-          "name": "MaxResultCount",
-          "jsonName": null,
-          "type": "System.Int32",
-          "typeSimple": "number",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,
@@ -8806,6 +9402,18 @@
           "regex": null
         },
         {
+          "name": "PhoneNumber",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
           "name": "AccountStatus",
           "jsonName": null,
           "type": "Tabebify.Profiles.ProviderAccountStatus",
@@ -8843,6 +9451,18 @@
         },
         {
           "name": "IsAvailable",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "HasActiveAssignment",
           "jsonName": null,
           "type": "System.Boolean",
           "typeSimple": "boolean",
@@ -10791,6 +11411,75 @@
       "genericArguments": null,
       "properties": null
     },
+    "Tabebify.Chats.CreateSupportFaqDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "Question",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": null,
+          "maxLength": 500,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Answer",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": null,
+          "maxLength": 2000,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Category",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": null,
+          "maxLength": 128,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "SortOrder",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "IsActive",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
     "Tabebify.Chats.GetChatMessagesInput": {
       "baseType": null,
       "isEnum": false,
@@ -10803,6 +11492,39 @@
           "jsonName": null,
           "type": "System.DateTime?",
           "typeSimple": "string?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "MaxResultCount",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Tabebify.Chats.GetChatsInput": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "SkipCount",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,
@@ -10839,6 +11561,156 @@
           "isRequired": true,
           "minLength": null,
           "maxLength": 4000,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Tabebify.Chats.SupportFaqDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "Id",
+          "jsonName": null,
+          "type": "System.Guid",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Question",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Answer",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Category",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "SortOrder",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "IsActive",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Tabebify.Chats.UpdateSupportFaqDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "Question",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": null,
+          "maxLength": 500,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Answer",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": null,
+          "maxLength": 2000,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Category",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": true,
+          "minLength": null,
+          "maxLength": 128,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "SortOrder",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "IsActive",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
           "minimum": null,
           "maximum": null,
           "regex": null
@@ -11610,6 +12482,39 @@
           "jsonName": null,
           "type": "System.DateTime?",
           "typeSimple": "string?",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Tabebify.Dtos.UserDocuments.UserDocumentDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "DocumentType",
+          "jsonName": null,
+          "type": "Tabebify.UserDocuments.DocumentType",
+          "typeSimple": "enum",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "FileUrl",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,

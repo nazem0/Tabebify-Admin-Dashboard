@@ -30,6 +30,16 @@ export class AppointmentService {
       { apiName: this.apiName, ...config },
     );
 
+  assignProvider = (appointmentId: string, providerId: string, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, void>(
+      {
+        method: 'POST',
+        url: '/api/app/appointment/assign-provider',
+        params: { appointmentId, providerId },
+      },
+      { apiName: this.apiName, ...config },
+    );
+
   cancel = (id: string, config?: Partial<Rest.Config>) =>
     this.restService.request<any, void>(
       {

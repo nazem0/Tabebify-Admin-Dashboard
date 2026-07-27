@@ -1,6 +1,12 @@
-import type { ChatDto, ChatMessageDto, GetChatMessagesInput, SendMessageDto } from './models';
+import type {
+  ChatDto,
+  ChatMessageDto,
+  GetChatMessagesInput,
+  GetChatsInput,
+  SendMessageDto,
+} from './models';
 import { RestService, Rest } from '@abp/ng.core';
-import type { ListResultDto, PagedResultDto } from '@abp/ng.core';
+import type { PagedResultDto } from '@abp/ng.core';
 import { Injectable, inject } from '@angular/core';
 
 @Injectable({
@@ -10,11 +16,30 @@ export class ChatService {
   private restService = inject(RestService);
   apiName = 'Default';
 
-  getChats = (config?: Partial<Rest.Config>) =>
-    this.restService.request<any, ListResultDto<ChatDto>>(
+  createOrGetSupportChat = (config?: Partial<Rest.Config>) =>
+    this.restService.request<any, ChatDto>(
+      {
+        method: 'POST',
+        url: '/create-or-get-support-chat',
+      },
+      { apiName: this.apiName, ...config },
+    );
+
+  getChat = (chatId: string, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, ChatDto>(
       {
         method: 'GET',
-        url: '/api/app/chat/chats',
+        url: `/${chatId}`,
+      },
+      { apiName: this.apiName, ...config },
+    );
+
+  getChats = (input: GetChatsInput, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, PagedResultDto<ChatDto>>(
+      {
+        method: 'GET',
+        url: '/chats',
+        params: { skipCount: input.skipCount, maxResultCount: input.maxResultCount },
       },
       { apiName: this.apiName, ...config },
     );
@@ -23,17 +48,26 @@ export class ChatService {
     this.restService.request<any, PagedResultDto<ChatMessageDto>>(
       {
         method: 'GET',
-        url: `/api/app/chat/messages/${chatId}`,
+        url: `/messages/${chatId}`,
         params: { before: input.before, maxResultCount: input.maxResultCount },
       },
       { apiName: this.apiName, ...config },
     );
 
-  getOrCreateSupportChat = (config?: Partial<Rest.Config>) =>
+  getOrCreateAppointmentChat = (appointmentId: string, config?: Partial<Rest.Config>) =>
     this.restService.request<any, ChatDto>(
       {
-        method: 'GET',
-        url: '/api/app/chat/or-create-support-chat',
+        method: 'POST',
+        url: `/or-create-appointment-chat/${appointmentId}`,
+      },
+      { apiName: this.apiName, ...config },
+    );
+
+  markAsRead = (chatId: string, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, void>(
+      {
+        method: 'POST',
+        url: `/mark-as-read/${chatId}`,
       },
       { apiName: this.apiName, ...config },
     );
@@ -42,7 +76,7 @@ export class ChatService {
     this.restService.request<any, ChatMessageDto>(
       {
         method: 'POST',
-        url: `/api/app/chat/send-message/${chatId}`,
+        url: `/send-message/${chatId}`,
         body: input,
       },
       { apiName: this.apiName, ...config },

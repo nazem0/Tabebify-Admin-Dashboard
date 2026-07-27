@@ -69,6 +69,8 @@ export class AdminDashboardService {
         url: '/api/app/admin-dashboard/providers',
         params: {
           accountStatus: input.accountStatus,
+          isAvailable: input.isAvailable,
+          onlyWithoutActiveAssignment: input.onlyWithoutActiveAssignment,
           filter: input.filter,
           skipCount: input.skipCount,
           maxResultCount: input.maxResultCount,

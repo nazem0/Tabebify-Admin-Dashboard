@@ -15,3 +15,8 @@ export interface UserDocumentDetailsDto {
   creationTime?: string;
   lastModificationTime?: string;
 }
+
+export interface UserDocumentDto {
+  documentType?: DocumentType;
+  fileUrl?: string;
+}

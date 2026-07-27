@@ -1,3 +1,4 @@
+import type { PagedResultRequestDto } from '@abp/ng.core';
 import type { ProviderAccountStatus } from '../profiles/provider-account-status.enum';
 
 export interface AdminAnalyticsDto {
@@ -32,21 +33,23 @@ export interface AdminPatientUpdateDto {
   dateOfBirth?: string;
 }
 
-export interface AdminProviderFilterInput {
+export interface AdminProviderFilterInput extends PagedResultRequestDto {
   accountStatus?: ProviderAccountStatus;
+  isAvailable?: boolean;
+  onlyWithoutActiveAssignment?: boolean;
   filter?: string;
-  skipCount?: number;
-  maxResultCount?: number;
 }
 
 export interface AdminProviderListDto {
   id?: string;
   fullName?: string;
   email?: string;
+  phoneNumber?: string;
   accountStatus?: ProviderAccountStatus;
   ratingAverage?: number;
   ratingCount?: number;
   isAvailable?: boolean;
+  hasActiveAssignment?: boolean;
   createdAt?: string;
   isAccountActive?: boolean;
 }
