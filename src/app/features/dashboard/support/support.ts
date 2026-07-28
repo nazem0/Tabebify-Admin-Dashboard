@@ -14,6 +14,7 @@ import { ChatType } from '../../../proxy/chats/chat-type.enum';
 import type { ChatDto, ChatMessageDto } from '../../../proxy/chats/models';
 import { AppInitialsPipe } from '../../../shared/pipes/initials.pipe';
 import { RelativeDatePipe } from '../../../shared/pipes/relative-date.pipe';
+import { buildPageArray } from '../../../shared/utils/pagination.utils';
 
 @Component({
   selector: 'app-support',
@@ -25,10 +26,15 @@ export class SupportComponent {
   private readonly chatService = inject(ChatService);
   private readonly destroyRef = inject(DestroyRef);
 
+  readonly pageSize = 20;
+
   protected readonly ChatType = ChatType;
 
   protected readonly allChats = signal<ChatDto[]>([]);
+  protected readonly totalCount = signal(0);
+  protected readonly page = signal(0);
   protected readonly isLoading = signal(true);
+  protected readonly isLoadingChats = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly search = signal('');
   protected readonly selectedChatId = signal<string | null>(null);
@@ -59,22 +65,41 @@ export class SupportComponent {
     () => this.supportChats().filter(c => (c.unreadCount ?? 0) > 0).length,
   );
 
+  protected readonly totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize));
+
+  protected readonly pages = computed(() => buildPageArray(this.totalPages(), this.page()));
+
+  private readonly loadChatsTrigger$ = new Subject<void>();
   private readonly messagesTrigger$ = new Subject<string>();
 
   constructor() {
-    this.chatService
-      .getChats()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.loadChatsTrigger$
+      .pipe(
+        switchMap(() => {
+          this.isLoadingChats.set(true);
+          this.error.set(null);
+          return this.chatService.getChats({
+            skipCount: this.page() * this.pageSize,
+            maxResultCount: this.pageSize,
+          });
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: result => {
           this.allChats.set(result.items ?? []);
+          this.totalCount.set(result.totalCount ?? 0);
           this.isLoading.set(false);
+          this.isLoadingChats.set(false);
         },
         error: () => {
           this.error.set('Failed to load support chats. Please try again.');
           this.isLoading.set(false);
+          this.isLoadingChats.set(false);
         },
       });
+
+    this.loadChatsTrigger$.next();
 
     this.messagesTrigger$
       .pipe(
@@ -95,6 +120,14 @@ export class SupportComponent {
 
   protected onSearch(value: string): void {
     this.search.set(value);
+  }
+
+  protected onPageChange(p: number | null): void {
+    if (p === null || p === this.page()) return;
+    this.page.set(p);
+    this.selectedChatId.set(null);
+    this.messages.set([]);
+    this.loadChatsTrigger$.next();
   }
 
   protected selectChat(chat: ChatDto): void {

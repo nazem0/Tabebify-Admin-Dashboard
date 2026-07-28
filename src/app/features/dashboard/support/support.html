@@ -29,7 +29,7 @@
           <span class="material-symbols-outlined text-white text-[22px]">support_agent</span>
         </div>
         <div>
-          <p class="text-3xl font-bold text-white tabular-nums">{{ supportChats().length }}</p>
+          <p class="text-3xl font-bold text-white tabular-nums">{{ totalCount() }}</p>
           <p class="text-[11px] font-semibold uppercase tracking-wider text-white/70 mt-0.5">Total Tickets</p>
         </div>
         <span class="material-symbols-outlined absolute -right-3 -bottom-3 text-[80px] opacity-10 select-none pointer-events-none text-white" aria-hidden="true">support_agent</span>
@@ -82,7 +82,7 @@
       <!-- List -->
       <div class="flex-1 overflow-y-auto divide-y divide-outline-variant/20" role="list">
 
-        @if (isLoading()) {
+        @if (isLoading() || isLoadingChats()) {
           <div class="p-4 space-y-4" aria-busy="true" aria-label="Loading conversations">
             @for (i of [1, 2, 3, 4, 5]; track i) {
               <div class="animate-pulse flex items-start gap-3">
@@ -145,6 +145,53 @@
         }
 
       </div>
+
+      @if (!isLoading() && totalCount() > 0) {
+        <div class="px-4 py-3 border-t border-outline-variant/20 flex flex-col gap-2">
+          <p class="text-[11px] text-on-surface-variant text-center">
+            Showing <span class="font-bold text-primary">{{ supportChats().length }}</span> of
+            <span class="font-bold text-primary">{{ totalCount() }}</span> conversations
+          </p>
+          @if (totalPages() > 1) {
+            <nav class="flex items-center justify-center gap-1" aria-label="Support chats pagination">
+              <button
+                class="w-7 h-7 flex items-center justify-center rounded-lg border border-outline-variant/30 bg-white hover:bg-surface-container-low disabled:opacity-30 transition-colors"
+                [disabled]="page() === 0 || isLoadingChats()"
+                (click)="onPageChange(page() - 1)"
+                aria-label="Previous page"
+              >
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_left</span>
+              </button>
+
+              @for (p of pages(); track $index) {
+                @if (p === null) {
+                  <span class="w-7 h-7 flex items-center justify-center text-on-surface-variant text-[11px] select-none">…</span>
+                } @else {
+                  <button
+                    class="w-7 h-7 flex items-center justify-center rounded-lg border font-bold text-[11px] transition-colors"
+                    [class]="p === page()
+                      ? 'border-primary bg-primary text-white'
+                      : 'border-outline-variant/30 bg-white hover:bg-surface-container-low text-on-surface-variant'"
+                    [disabled]="isLoadingChats()"
+                    (click)="onPageChange(p)"
+                    [attr.aria-label]="'Page ' + (p + 1)"
+                    [attr.aria-current]="p === page() ? 'page' : null"
+                  >{{ p + 1 }}</button>
+                }
+              }
+
+              <button
+                class="w-7 h-7 flex items-center justify-center rounded-lg border border-outline-variant/30 bg-white hover:bg-surface-container-low disabled:opacity-30 transition-colors"
+                [disabled]="page() >= totalPages() - 1 || isLoadingChats()"
+                (click)="onPageChange(page() + 1)"
+                aria-label="Next page"
+              >
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_right</span>
+              </button>
+            </nav>
+          }
+        </div>
+      }
     </section>
 
     <!-- ── Chat Detail Pane ── -->
