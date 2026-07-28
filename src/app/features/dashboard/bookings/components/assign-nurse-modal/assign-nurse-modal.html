@@ -1,0 +1,198 @@
+<app-generic-modal
+  [isOpen]="isOpen()"
+  title="Assign Nurse"
+  size="lg"
+  [closeOnOverlayClick]="!isAssigning()"
+  (onClose)="handleClose()"
+>
+  <div modal-body class="space-y-4">
+    @if (appointment(); as booking) {
+      <div class="rounded-xl bg-surface-container-low px-4 py-3 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+        <div>
+          <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Visit</p>
+          <p class="font-semibold text-primary font-mono">
+            {{ booking.visitNumber ?? booking.id?.slice(0, 8)?.toUpperCase() }}
+          </p>
+        </div>
+        <div class="min-w-0">
+          <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Service</p>
+          <p class="font-semibold text-primary truncate">{{ booking.serviceName ?? '—' }}</p>
+        </div>
+        @if (booking.addressLabel) {
+          <div class="min-w-0 flex-1 basis-full sm:basis-auto">
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Location</p>
+            <p class="text-on-surface-variant truncate">{{ booking.addressLabel }}</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Search -->
+    <div class="relative">
+      <span
+        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]"
+        aria-hidden="true"
+      >search</span>
+      <input
+        type="search"
+        class="w-full pl-9 pr-4 py-2.5 bg-surface-container-low border-none rounded-xl text-body-md focus:ring-2 focus:ring-accent-teal/40 outline-none"
+        placeholder="Search nurses by name or email…"
+        [value]="search()"
+        (input)="onSearch($any($event.target).value)"
+        aria-label="Search nurses"
+        [disabled]="isAssigning()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-semibold border transition-colors"
+        [class]="availableOnly()
+          ? 'bg-accent-teal/10 text-teal-700 border-accent-teal/30'
+          : 'bg-white text-on-surface-variant border-outline-variant/40 hover:bg-surface-container-low'"
+        (click)="toggleAvailableOnly()"
+        [disabled]="isAssigning()"
+        [attr.aria-pressed]="availableOnly()"
+      >
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">
+          {{ availableOnly() ? 'check_circle' : 'radio_button_unchecked' }}
+        </span>
+        Available only
+      </button>
+      <button
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-semibold border transition-colors"
+        [class]="withoutActiveAssignment()
+          ? 'bg-accent-teal/10 text-teal-700 border-accent-teal/30'
+          : 'bg-white text-on-surface-variant border-outline-variant/40 hover:bg-surface-container-low'"
+        (click)="toggleWithoutActiveAssignment()"
+        [disabled]="isAssigning()"
+        [attr.aria-pressed]="withoutActiveAssignment()"
+      >
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">
+          {{ withoutActiveAssignment() ? 'check_circle' : 'radio_button_unchecked' }}
+        </span>
+        No active assignment
+      </button>
+    </div>
+
+    <!-- Nurse list -->
+    <div
+      class="rounded-xl border border-outline-variant/20 overflow-hidden min-h-48 max-h-72 overflow-y-auto"
+      role="listbox"
+      aria-label="Available nurses"
+      [attr.aria-busy]="isLoading()"
+    >
+      @if (isLoading()) {
+        <div class="space-y-0 divide-y divide-outline-variant/15" aria-hidden="true">
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div class="animate-pulse flex items-center gap-3 px-4 py-3">
+              <div class="w-10 h-10 rounded-full bg-surface-container-high shrink-0"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-3.5 w-1/3 rounded bg-surface-container-high"></div>
+                <div class="h-3 w-1/2 rounded bg-surface-container-high"></div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (loadError()) {
+        <div class="flex flex-col items-center justify-center py-12 px-4 text-center text-error">
+          <span class="material-symbols-outlined text-[32px] opacity-60" aria-hidden="true">error</span>
+          <p class="text-sm mt-2">{{ loadError() }}</p>
+        </div>
+      } @else if (providers().length === 0) {
+        <div class="flex flex-col items-center justify-center py-12 px-4 text-center text-on-surface-variant">
+          <span class="material-symbols-outlined text-[40px] opacity-20" aria-hidden="true">person_off</span>
+          <p class="text-sm font-medium mt-2">No nurses match these filters</p>
+          <p class="text-xs mt-1 opacity-70">Try clearing a filter or searching a different name.</p>
+        </div>
+      } @else {
+        @for (nurse of providers(); track nurse.id) {
+          <button
+            type="button"
+            role="option"
+            class="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors border-b border-outline-variant/15 last:border-b-0"
+            [class]="selectedId() === nurse.id
+              ? 'bg-accent-teal/10 ring-inset ring-2 ring-accent-teal/40'
+              : 'hover:bg-surface-container-low'"
+            [attr.aria-selected]="selectedId() === nurse.id"
+            [disabled]="isAssigning()"
+            (click)="selectProvider(nurse)"
+          >
+            <div
+              class="w-10 h-10 rounded-full bg-primary/8 flex items-center justify-center font-bold text-primary text-sm shrink-0"
+              aria-hidden="true"
+            >{{ nurse.fullName | initials }}</div>
+
+            <div class="min-w-0 flex-1">
+              <p class="font-semibold text-primary text-body-md truncate">{{ nurse.fullName ?? '—' }}</p>
+              <p class="text-[12px] text-on-surface-variant truncate">{{ nurse.email ?? nurse.phoneNumber ?? '—' }}</p>
+            </div>
+
+            <div class="flex flex-col items-end gap-1 shrink-0">
+              @if (nurse.ratingAverage) {
+                <span class="inline-flex items-center gap-0.5 text-[12px] font-semibold text-primary tabular-nums">
+                  <span class="material-symbols-outlined text-[14px] text-amber-500" aria-hidden="true">star</span>
+                  {{ nurse.ratingAverage.toFixed(1) }}
+                </span>
+              }
+              <div class="flex items-center gap-1.5">
+                <span
+                  class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
+                  [class]="nurse.isAvailable
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : 'bg-surface-container-high text-on-surface-variant'"
+                >
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    [class]="nurse.isAvailable ? 'bg-emerald-500' : 'bg-outline-variant'"
+                    aria-hidden="true"
+                  ></span>
+                  {{ nurse.isAvailable ? 'Available' : 'Busy' }}
+                </span>
+                @if (nurse.hasActiveAssignment) {
+                  <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700">
+                    On job
+                  </span>
+                }
+              </div>
+            </div>
+
+            @if (selectedId() === nurse.id) {
+              <span class="material-symbols-outlined text-accent-teal text-[22px] shrink-0" aria-hidden="true">check_circle</span>
+            }
+          </button>
+        }
+      }
+    </div>
+  </div>
+
+  <div modal-footer class="flex gap-3 justify-end">
+    <button
+      type="button"
+      class="px-5 py-2.5 rounded-xl border border-outline-variant font-semibold text-body-md text-on-surface-variant hover:bg-surface-container-low transition-colors disabled:opacity-50"
+      (click)="handleClose()"
+      [disabled]="isAssigning()"
+    >Cancel</button>
+    <button
+      type="button"
+      class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-accent-teal text-white font-bold text-body-md hover:bg-accent-teal/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-36"
+      (click)="confirmAssign()"
+      [disabled]="!selectedId() || isAssigning() || isLoading()"
+      [attr.aria-busy]="isAssigning()"
+    >
+      @if (isAssigning()) {
+        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        Assigning…
+      } @else {
+        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">person_add</span>
+        Assign Nurse
+      }
+    </button>
+  </div>
+</app-generic-modal>

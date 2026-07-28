@@ -17,6 +17,7 @@ import { AppInitialsPipe } from '../../../shared/pipes/initials.pipe';
 import { AppDatePipe } from '../../../shared/pipes/app-date.pipe';
 import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
 import { buildPageArray } from '../../../shared/utils/pagination.utils';
+import { AssignNurseModalComponent } from './components/assign-nurse-modal/assign-nurse-modal';
 
 // Note: Text search, status, date-range, and assigned filters are applied client-side
 // because the appointments endpoint only supports isActive + pagination.
@@ -31,7 +32,14 @@ interface SelectOption<T> {
 @Component({
   selector: 'app-bookings',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [StatusBadgeComponent, AppInitialsPipe, AppDatePipe, AppCurrencyPipe, DatePipe],
+  imports: [
+    StatusBadgeComponent,
+    AppInitialsPipe,
+    AppDatePipe,
+    AppCurrencyPipe,
+    DatePipe,
+    AssignNurseModalComponent,
+  ],
   templateUrl: './bookings.html',
 })
 export class BookingsComponent {
@@ -49,6 +57,7 @@ export class BookingsComponent {
   protected readonly statusFilter = signal<number | null>(null);
   protected readonly dateRangeFilter = signal<string>('all');
   protected readonly assignedFilter = signal<string>('all');
+  protected readonly assignTarget = signal<AppointmentSummaryDto | null>(null);
 
   protected readonly dateRangeOptions: SelectOption<string>[] = [
     { label: 'All Time',    value: 'all'   },
@@ -184,4 +193,16 @@ export class BookingsComponent {
     return !booking.assignedProviderName;
   }
 
+  protected openAssignNurse(booking: AppointmentSummaryDto): void {
+    this.assignTarget.set(booking);
+  }
+
+  protected closeAssignNurse(): void {
+    this.assignTarget.set(null);
+  }
+
+  protected onNurseAssigned(): void {
+    this.assignTarget.set(null);
+    this.loadTrigger$.next();
+  }
 }
