@@ -1,7 +1,7 @@
-<div class="p-gutter space-y-gutter max-w-[1440px]">
+<div class="p-gutter space-y-gutter max-w-[1440px] max-lg:flex max-lg:flex-col max-lg:min-h-0">
 
-  <!-- Page Header -->
-  <div>
+  <!-- Page Header — hide on mobile while viewing a conversation -->
+  <div [ngClass]="{ 'max-lg:hidden': !!selectedChatId() }">
     <h2 class="font-headline-lg text-headline-lg text-primary tracking-tight">Support Management</h2>
     <p class="font-body-md text-on-surface-variant">Monitor and respond to user support conversations.</p>
   </div>
@@ -14,15 +14,18 @@
     </div>
   }
 
-  <!-- ── Stat Cards ── -->
+  <!-- ── Stat Cards — hide on mobile while viewing a conversation -->
   @if (isLoading()) {
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter" [ngClass]="{ 'max-lg:hidden': !!selectedChatId() }">
       @for (i of [1, 2, 3]; track i) {
         <div class="animate-pulse rounded-2xl bg-surface-container-low h-28"></div>
       }
     </div>
   } @else {
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+    <div
+      class="grid grid-cols-1 md:grid-cols-3 gap-gutter"
+      [ngClass]="{ 'max-lg:hidden': !!selectedChatId() }"
+    >
 
       <div class="bg-primary rounded-2xl p-6 flex items-center gap-4 relative overflow-hidden shadow-sm">
         <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0" aria-hidden="true">
@@ -59,13 +62,23 @@
   }
 
   <!-- ── Two-Pane Chat Layout ── -->
-  <div class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-gutter">
+  <div
+    class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-gutter min-h-[22rem]
+           lg:h-[calc(100vh-20rem)] lg:min-h-[28rem]"
+    [ngClass]="selectedChatId()
+      ? 'h-[calc(100dvh-6.5rem)]'
+      : 'h-[calc(100dvh-14rem)]'"
+  >
 
-    <!-- ── Chat List Pane ── -->
-    <section class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden flex flex-col" aria-label="Support conversations list">
+    <!-- ── Chat List Pane (hidden on mobile when a chat is open) ── -->
+    <section
+      class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden flex flex-col min-h-0 h-full"
+      [ngClass]="{ 'max-lg:hidden': !!selectedChatId() }"
+      aria-label="Support conversations list"
+    >
 
       <!-- Search -->
-      <div class="px-4 py-4 border-b border-outline-variant/20">
+      <div class="px-4 py-4 border-b border-outline-variant/20 shrink-0">
         <div class="relative">
           <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" aria-hidden="true">search</span>
           <input
@@ -80,7 +93,7 @@
       </div>
 
       <!-- List -->
-      <div class="flex-1 overflow-y-auto divide-y divide-outline-variant/20" role="list">
+      <div class="flex-1 overflow-y-auto min-h-0 overscroll-contain divide-y divide-outline-variant/20" role="list">
 
         @if (isLoading() || isLoadingChats()) {
           <div class="p-4 space-y-4" aria-busy="true" aria-label="Loading conversations">
@@ -128,9 +141,15 @@
                   <p class="font-semibold text-primary text-body-md truncate">{{ chat.otherUserName ?? 'Unknown User' }}</p>
                   <span class="text-[11px] text-on-surface-variant flex-shrink-0">{{ chat.lastMessageAt | relativeDate }}</span>
                 </div>
-                <p class="text-[12px] text-on-surface-variant truncate mt-0.5">
-                  {{ chat.lastMessage || 'No messages yet' }}
-                </p>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span
+                    class="flex-shrink-0 text-[10px] font-semibold uppercase tracking-wide"
+                    [class]="isSupportChat(chat) ? 'text-accent-teal' : 'text-on-surface-variant/70'"
+                  >{{ chatTypeLabel(chat) }}</span>
+                  <p class="text-[12px] text-on-surface-variant truncate">
+                    {{ chat.lastMessage || 'No messages yet' }}
+                  </p>
+                </div>
               </div>
 
               @if ((chat.unreadCount ?? 0) > 0) {
@@ -147,7 +166,7 @@
       </div>
 
       @if (!isLoading() && totalCount() > 0) {
-        <div class="px-4 py-3 border-t border-outline-variant/20 flex flex-col gap-2">
+        <div class="px-4 py-3 border-t border-outline-variant/20 flex flex-col gap-2 shrink-0">
           <p class="text-[11px] text-on-surface-variant text-center">
             Showing <span class="font-bold text-primary">{{ supportChats().length }}</span> of
             <span class="font-bold text-primary">{{ totalCount() }}</span> conversations
@@ -194,11 +213,15 @@
       }
     </section>
 
-    <!-- ── Chat Detail Pane ── -->
-    <section class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden flex flex-col" aria-label="Conversation messages">
+    <!-- ── Chat Detail Pane (hidden on mobile until a chat is selected) ── -->
+    <section
+      class="bg-white rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden flex flex-col min-h-0 h-full"
+      [ngClass]="{ 'max-lg:hidden': !selectedChatId() }"
+      aria-label="Conversation messages"
+    >
 
       @if (!selectedChatId()) {
-        <div class="flex-1 flex flex-col items-center justify-center py-20 text-on-surface-variant px-6 text-center">
+        <div class="flex-1 flex flex-col items-center justify-center py-20 text-on-surface-variant px-6 text-center min-h-0">
           <div class="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center mb-4" aria-hidden="true">
             <span class="material-symbols-outlined text-[40px] text-primary/30">forum</span>
           </div>
@@ -209,25 +232,33 @@
       } @else {
 
         <!-- Chat Header -->
-        <div class="px-6 py-4 border-b border-outline-variant/20 flex items-center gap-4">
+        <div class="px-4 sm:px-6 py-4 border-b border-outline-variant/20 flex items-center gap-3 sm:gap-4 shrink-0">
+          <button
+            type="button"
+            class="lg:hidden flex items-center justify-center w-9 h-9 rounded-xl text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors shrink-0"
+            (click)="clearSelection()"
+            aria-label="Back to conversations"
+          >
+            <span class="material-symbols-outlined text-[22px]" aria-hidden="true">arrow_back</span>
+          </button>
           <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary flex-shrink-0" aria-hidden="true">
             {{ selectedChat()?.otherUserName | initials }}
           </div>
           <div class="flex-1 min-w-0">
-            <p class="font-semibold text-primary text-body-md">{{ selectedChat()?.otherUserName ?? 'Unknown User' }}</p>
-            <p class="text-[12px] text-on-surface-variant">
-              Support conversation · {{ selectedChat()?.lastMessageAt | relativeDate }}
+            <p class="font-semibold text-primary text-body-md truncate">{{ selectedChat()?.otherUserName ?? 'Unknown User' }}</p>
+            <p class="text-[12px] text-on-surface-variant truncate">
+              {{ chatTypeLabel(selectedChat()) }} conversation · {{ selectedChat()?.lastMessageAt | relativeDate }}
             </p>
           </div>
           @if ((selectedChat()?.unreadCount ?? 0) > 0) {
-            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-error/10 text-error">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-error/10 text-error shrink-0">
               {{ selectedChat()?.unreadCount }} unread
             </span>
           }
         </div>
 
         <!-- Messages -->
-        <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-0" aria-live="polite" aria-label="Messages">
+        <div class="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 py-4 space-y-4 min-h-0" aria-live="polite" aria-label="Messages">
 
           @if (isLoadingMessages()) {
             <div class="space-y-4" aria-busy="true" aria-label="Loading messages">
@@ -260,12 +291,12 @@
                 </div>
 
                 <div
-                  class="max-w-[70%] px-4 py-2.5 rounded-2xl text-body-md leading-relaxed"
+                  class="max-w-[85%] sm:max-w-[70%] px-4 py-2.5 rounded-2xl text-body-md leading-relaxed"
                   [class]="msg.senderId !== selectedChat()?.otherUserId
                     ? 'bg-primary text-white rounded-br-sm'
                     : 'bg-surface-container-low text-primary rounded-bl-sm'"
                 >
-                  <p>{{ msg.content }}</p>
+                  <p class="break-words">{{ msg.content }}</p>
                   <p
                     class="text-[10px] mt-1"
                     [class]="msg.senderId !== selectedChat()?.otherUserId ? 'text-white/60' : 'text-on-surface-variant'"
@@ -275,16 +306,54 @@
             }
           }
 
+          @if (isOtherTyping()) {
+            <p class="text-[12px] text-on-surface-variant italic px-1" aria-live="polite">
+              {{ selectedChat()?.otherUserName ?? 'User' }} is typing…
+            </p>
+          }
+
         </div>
 
-        <!-- Reply Note -->
-        <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low/30">
-          <div class="flex items-center gap-3 p-3 rounded-xl border border-outline-variant/30 bg-white">
-            <span class="material-symbols-outlined text-[18px] text-on-surface-variant" aria-hidden="true">info</span>
-            <p class="text-[12px] text-on-surface-variant flex-1">
-              Reply functionality requires a messaging API endpoint. View-only mode is active.
-            </p>
-          </div>
+        <!-- Reply Composer (Support only) -->
+        <div class="px-4 sm:px-6 py-3 sm:py-4 border-t border-outline-variant/20 bg-surface-container-low/30 shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          @if (canReply()) {
+            @if (sendError()) {
+              <p role="alert" class="mb-2 text-[12px] text-error">{{ sendError() }}</p>
+            }
+            <div class="flex items-end gap-2 sm:gap-3">
+              <label class="sr-only" for="support-reply">Reply message</label>
+              <textarea
+                id="support-reply"
+                rows="2"
+                class="flex-1 min-w-0 resize-none rounded-xl border border-outline-variant/30 bg-white px-3 sm:px-4 py-2.5 text-body-md text-primary outline-none focus:ring-2 focus:ring-accent-teal/40 disabled:opacity-50"
+                placeholder="Type a reply…"
+                [value]="replyDraft()"
+                [disabled]="isSending()"
+                (input)="onReplyDraft($any($event.target).value)"
+                (keydown)="onReplyKeydown($event)"
+              ></textarea>
+              <button
+                type="button"
+                class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+                [disabled]="isSending() || !replyDraft().trim()"
+                (click)="sendReply()"
+                [attr.aria-label]="isSending() ? 'Sending…' : 'Send reply'"
+              >
+                @if (isSending()) {
+                  <span class="material-symbols-outlined animate-spin text-[20px]" aria-hidden="true">progress_activity</span>
+                } @else {
+                  <span class="material-symbols-outlined text-[20px]" aria-hidden="true">send</span>
+                }
+              </button>
+            </div>
+          } @else {
+            <div class="flex items-center gap-3 p-3 rounded-xl border border-outline-variant/30 bg-white">
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant" aria-hidden="true">visibility</span>
+              <p class="text-[12px] text-on-surface-variant flex-1">
+                View-only — replies are available for support conversations only.
+              </p>
+            </div>
+          }
         </div>
 
       }
